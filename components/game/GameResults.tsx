@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Mascot } from "@/components/gamification/Mascot";
 import { buttonVariants } from "@/components/ui/button";
 import { computeXpForCompletion } from "@/lib/gamification/xp";
+import { STORY_LEVEL_COUNT } from "@/lib/story/levels";
 import { useSharedUser } from "@/hooks/useSharedUser";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/useGameStore";
@@ -17,18 +18,31 @@ export function GameResults() {
   const mistakes = useGameStore((s) => s.mistakes);
   const elapsedSeconds = useGameStore((s) => s.elapsedSeconds);
   const hintsUsed = useGameStore((s) => s.hintsUsed);
+  const gameMode = useGameStore((s) => s.gameMode);
+  const storyLevel = useGameStore((s) => s.storyLevel);
   const { refresh } = useSharedUser();
+  const savedRef = useRef(false);
 
   const xp = computeXpForCompletion({
-    difficulty: "facile",
+    difficulty: gameMode === "story" && storyLevel ? "moyen" : "facile",
     timeSeconds: elapsedSeconds,
     mistakesCount: mistakes,
     hintsUsed,
   });
 
   useEffect(() => {
-    if (!isComplete) return;
+    if (!isComplete || savedRef.current) return;
+    savedRef.current = true;
     confetti({ particleCount: 80, spread: 60, origin: { y: 0.65 } });
+
+    if (gameMode === "story" && storyLevel) {
+      void fetch("/api/story/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level: storyLevel }),
+      }).then(() => refresh());
+      return;
+    }
 
     void fetch("/api/puzzle/complete", {
       method: "POST",
@@ -40,9 +54,20 @@ export function GameResults() {
         hintsUsed,
       }),
     }).then(() => refresh());
-  }, [isComplete, elapsedSeconds, mistakes, hintsUsed, refresh]);
+  }, [
+    isComplete,
+    elapsedSeconds,
+    mistakes,
+    hintsUsed,
+    refresh,
+    gameMode,
+    storyLevel,
+  ]);
 
   if (!isComplete) return null;
+
+  const nextStoryLevel =
+    storyLevel && storyLevel < STORY_LEVEL_COUNT ? storyLevel + 1 : null;
 
   return (
     <motion.div
@@ -65,12 +90,38 @@ export function GameResults() {
           <p className="font-bold">+{xp}</p>
         </div>
       </div>
-      <Link href="/app/jouer" className={cn(buttonVariants(), "w-full")}>
-        Nouvelle grille
-      </Link>
-      <Link href="/app" className={cn(buttonVariants({ variant: "outline" }), "w-full")}>
-        Retour aux leçons
-      </Link>
+
+      {gameMode === "story" && storyLevel ? (
+        <>
+          {nextStoryLevel ? (
+            <Link
+              href={`/app/jouer?histoire=${nextStoryLevel}`}
+              className={cn(buttonVariants(), "w-full")}
+            >
+              Niveau {nextStoryLevel}
+            </Link>
+          ) : (
+            <p className="text-center text-sm font-medium text-primary">
+              Tu as fini toute l&apos;histoire !
+            </p>
+          )}
+          <Link
+            href="/app/histoire"
+            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+          >
+            Retour à l&apos;histoire
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link href="/app/jouer" className={cn(buttonVariants(), "w-full")}>
+            Nouvelle grille
+          </Link>
+          <Link href="/app" className={cn(buttonVariants({ variant: "outline" }), "w-full")}>
+            Retour aux leçons
+          </Link>
+        </>
+      )}
     </motion.div>
   );
 }

@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Grid3X3, User } from "lucide-react";
+import { BookOpen, Grid3X3, Home, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/app", label: "Accueil", icon: Home },
+  { href: "/app/histoire", label: "Histoire", icon: BookOpen },
   { href: "/app/defi-du-jour", label: "Défi", icon: Grid3X3 },
   { href: "/app/profil", label: "Profil", icon: User },
 ] as const;
@@ -16,7 +17,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky bottom-0 z-20 border-t bg-card/95 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
+    <nav className="sticky bottom-0 z-20 border-t bg-card/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
       <div className="flex justify-around">
         {NAV.map(({ href, label, icon: Icon }) => {
           const active =
@@ -26,7 +27,7 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                "flex flex-col items-center gap-0.5 rounded-lg px-4 py-1.5 text-[11px] font-medium active:scale-95",
+                "flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[10px] font-medium active:scale-95",
                 active ? "text-primary" : "text-muted-foreground",
               )}
             >

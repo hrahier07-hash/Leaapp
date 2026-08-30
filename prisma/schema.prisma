@@ -58,6 +58,7 @@ model User {
   lastHeartLostAt   DateTime?
   streakFreezes     Int       @default(0)
   pushSubscription  Json?
+  storyLevelUnlocked Int       @default(1)
 
   accounts          Account[]
   sessions          Session[]

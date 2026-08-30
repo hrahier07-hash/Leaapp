@@ -21,7 +21,7 @@ export function CellInputSheet() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-black/30"
+            className="fixed inset-0 z-40 bg-black/10"
             aria-label="Fermer"
             onClick={clearSelection}
           />
@@ -30,22 +30,24 @@ export function CellInputSheet() {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 rounded-t-2xl bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 shadow-lg ring-1 ring-border"
+            className="fixed bottom-0 left-1/2 z-50 flex max-h-[38vh] w-full max-w-[430px] -translate-x-1/2 flex-col rounded-t-2xl border-t border-border/40 bg-background/55 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 shadow-lg backdrop-blur-md"
           >
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-semibold">
-                Case {row + 1}, {col + 1}
+            <div className="mb-2 flex shrink-0 items-center justify-between">
+              <p className="text-xs font-medium text-foreground/80">
+                Case ligne {row + 1}, colonne {col + 1}
               </p>
               <button
                 type="button"
                 onClick={clearSelection}
-                className="flex size-9 items-center justify-center rounded-full bg-muted active:scale-95"
+                className="flex size-8 items-center justify-center rounded-full bg-background/60 active:scale-95"
                 aria-label="Fermer"
               >
-                <X className="size-4" />
+                <X className="size-3.5" />
               </button>
             </div>
-            <InputPanel variant="sheet" onDone={clearSelection} />
+            <div className="min-h-0 overflow-y-auto">
+              <InputPanel variant="sheet" onDone={clearSelection} />
+            </div>
           </motion.div>
         </>
       )}

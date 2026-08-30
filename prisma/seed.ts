@@ -50,7 +50,7 @@ async function main() {
     update: {},
     create: {
       email: "joueur@sudoku-quest.app",
-      name: "Joueur Sudoku",
+      name: "Joueur LeaDoku",
       hearts: 5,
       hints: 5,
       gems: 0,
@@ -58,6 +58,7 @@ async function main() {
       currentStreak: 0,
       longestStreak: 0,
       onboardingDone: true,
+      storyLevelUnlocked: 1,
     },
   });
 

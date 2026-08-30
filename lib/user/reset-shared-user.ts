@@ -10,7 +10,7 @@ export async function resetSharedUser() {
     return prisma.user.create({
       data: {
         email: SHARED_USER_EMAIL,
-        name: "Joueur Sudoku",
+        name: "Joueur LeaDoku",
         hearts: 5,
         hints: 5,
         gems: 0,
@@ -18,6 +18,7 @@ export async function resetSharedUser() {
         currentStreak: 0,
         longestStreak: 0,
         onboardingDone: false,
+        storyLevelUnlocked: 1,
       },
     });
   }
@@ -43,6 +44,7 @@ export async function resetSharedUser() {
         startingLevel: null,
         lastHeartLostAt: null,
         streakFreezes: 0,
+        storyLevelUnlocked: 1,
       },
     }),
   ]);

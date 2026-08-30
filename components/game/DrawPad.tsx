@@ -14,8 +14,8 @@ import type { Point, Stroke } from "@/lib/sudoku/types";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/useGameStore";
 
-const STROKE_SIZE_INLINE = 16;
-const STROKE_SIZE_SHEET = 22;
+const STROKE_SIZE_INLINE = 8;
+const STROKE_SIZE_SHEET = 10;
 
 function getCanvasPoint(
   canvas: HTMLCanvasElement,
@@ -171,7 +171,9 @@ export function DrawPad({
       );
 
       clearCanvas();
-      if (isValid) onDone?.();
+      if (isValid) {
+        window.setTimeout(() => onDone?.(), 450);
+      }
     } finally {
       setIsRecognizing(false);
     }
@@ -246,7 +248,7 @@ export function DrawPad({
     setHint("Case effacée");
   };
 
-  const canvasHeight = variant === "sheet" ? "h-56" : "h-48";
+  const canvasHeight = variant === "sheet" ? "h-36" : "h-48";
   const showCanvas = variant === "sheet" || selectedCell;
 
   return (
@@ -298,7 +300,7 @@ export function DrawPad({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             className={cn(
-              "overflow-hidden rounded-2xl border-2 bg-white shadow-inner",
+              "overflow-hidden rounded-2xl border-2 bg-white/85 shadow-inner",
               isDrawing ? "border-primary" : "border-border",
               isRecognizing && "opacity-70",
             )}

@@ -21,7 +21,7 @@ export async function getOrCreateSharedUser() {
   return prisma.user.create({
     data: {
       email: SHARED_USER_EMAIL,
-      name: "Joueur Sudoku",
+      name: "Joueur LeaDoku",
       hearts: 5,
       hints: 5,
       gems: 0,
@@ -29,6 +29,7 @@ export async function getOrCreateSharedUser() {
       currentStreak: 0,
       longestStreak: 0,
       onboardingDone: true,
+      storyLevelUnlocked: 1,
     },
     include: {
       _count: {
@@ -52,6 +53,7 @@ export type SharedUserProfile = {
   gems: number;
   puzzlesCompleted: number;
   badgesCount: number;
+  storyLevelUnlocked: number;
 };
 
 export async function getSharedUserProfile(): Promise<SharedUserProfile> {
@@ -67,5 +69,6 @@ export async function getSharedUserProfile(): Promise<SharedUserProfile> {
     gems: user.gems,
     puzzlesCompleted: user._count.attempts,
     badgesCount: user._count.badges,
+    storyLevelUnlocked: user.storyLevelUnlocked,
   };
 }

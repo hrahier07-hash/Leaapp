@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { CellInputSheet } from "@/components/game/CellInputSheet";
@@ -9,18 +9,31 @@ import { GameResults } from "@/components/game/GameResults";
 import { SudokuBoard } from "@/components/game/SudokuBoard";
 import { MobileShell } from "@/components/layout/MobileShell";
 import { getLesson } from "@/lib/lessons/content";
+import { getStoryLevelLabel, getStoryPuzzle } from "@/lib/story/levels";
 import { useGameStore } from "@/store/useGameStore";
 
 function GameScreenContent() {
   const isPaused = useGameStore((s) => s.isPaused);
   const searchParams = useSearchParams();
   const technique = searchParams.get("technique");
+  const histoireParam = searchParams.get("histoire");
+  const storyLevel = histoireParam ? Number(histoireParam) : null;
   const lesson = technique ? getLesson(technique) : null;
-  const title = lesson ? lesson.title : "Jouer";
+
+  const title = storyLevel
+    ? `Histoire · Niveau ${storyLevel}`
+    : lesson
+      ? lesson.title
+      : "Jouer";
 
   return (
     <MobileShell title={title}>
       <div className="flex flex-col gap-3 py-2 pb-4">
+        {storyLevel && (
+          <p className="text-center text-xs text-muted-foreground">
+            {getStoryLevelLabel(storyLevel)}
+          </p>
+        )}
         {lesson && (
           <p className="text-center text-xs text-muted-foreground">
             {lesson.summary}
@@ -35,16 +48,55 @@ function GameScreenContent() {
   );
 }
 
-export function GameScreen() {
+function GameLoader() {
+  const searchParams = useSearchParams();
+  const loadPuzzle = useGameStore((s) => s.loadPuzzle);
   const resetGame = useGameStore((s) => s.resetGame);
+  const [ready, setReady] = useState(false);
+
+  const technique = searchParams.get("technique");
+  const histoireParam = searchParams.get("histoire");
+  const storyLevel = histoireParam ? Number(histoireParam) : null;
 
   useEffect(() => {
-    resetGame();
-  }, [resetGame]);
+    if (storyLevel && storyLevel >= 1 && storyLevel <= 50) {
+      setReady(false);
+      const { puzzle, solution } = getStoryPuzzle(storyLevel);
+      loadPuzzle(puzzle, solution, { gameMode: "story", storyLevel });
+      setReady(true);
+      return;
+    }
 
+    resetGame();
+    if (technique) {
+      useGameStore.setState({ gameMode: "lesson" });
+    }
+    setReady(true);
+  }, [storyLevel, technique, loadPuzzle, resetGame]);
+
+  if (!ready) {
+    return (
+      <MobileShell title="Jouer">
+        <p className="py-12 text-center text-sm text-muted-foreground">
+          Préparation de la grille…
+        </p>
+      </MobileShell>
+    );
+  }
+
+  return <GameScreenContent />;
+}
+
+export function GameScreen() {
   return (
-    <Suspense fallback={<MobileShell title="Jouer"><p className="py-8 text-center text-sm text-muted-foreground">Chargement…</p></MobileShell>}>
-      <GameScreenContent />
+    <Suspense
+      fallback={
+        <MobileShell title="Jouer">
+          <p className="py-8 text-center text-sm text-muted-foreground">Chargement…</p>
+        </MobileShell>
+      }
+    >
+      <GameLoader />
     </Suspense>
   );
 }

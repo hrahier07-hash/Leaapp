@@ -15,13 +15,13 @@ type MobileShellProps = {
 
 export function MobileShell({
   children,
-  title = "Sudoku Quest",
+  title = "LeaDoku",
   showNav = true,
 }: MobileShellProps) {
   return (
     <div className="mobile-app flex min-h-dvh flex-col">
       <header className="sticky top-0 z-20 bg-background/95 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
-        <p className="text-xs font-medium text-muted-foreground">Sudoku Quest</p>
+        <p className="text-xs font-medium text-muted-foreground">LeaDoku</p>
         <h1 className="text-xl font-semibold">{title}</h1>
       </header>
 

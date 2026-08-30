@@ -12,7 +12,7 @@ export type SharedUserProfile = {
   hints: number;
   gems: number;
   puzzlesCompleted: number;
-  badgesCount: number;
+  storyLevelUnlocked: number;
 };
 
 export function useSharedUser() {

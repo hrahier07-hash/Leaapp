@@ -27,7 +27,9 @@ export function NumberPad({ onDone }: { onDone?: () => void }) {
 
     const isValid = setCellValue(selectedCell.row, selectedCell.col, digit);
     setLastRecognition(digit, isValid ? 100 : 100);
-    if (!notesMode && isValid) onDone?.();
+    if (!notesMode && isValid) {
+      window.setTimeout(() => onDone?.(), 450);
+    }
   };
 
   const handleClear = () => {

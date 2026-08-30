@@ -29,6 +29,8 @@ type GameState = {
   elapsedSeconds: number;
   history: HistoryEntry[];
   lastRecognition: { digit: number; confidence: number } | null;
+  gameMode: "free" | "lesson" | "story" | "daily";
+  storyLevel: number | null;
   selectCell: (row: number, col: number) => void;
   toggleNotesMode: () => void;
   togglePause: () => void;
@@ -40,6 +42,11 @@ type GameState = {
   useHint: () => boolean;
   setLastRecognition: (digit: number | null, confidence: number) => void;
   resetGame: () => void;
+  loadPuzzle: (
+    initialGrid: Grid,
+    solutionGrid: Grid,
+    options?: { gameMode?: GameState["gameMode"]; storyLevel?: number | null },
+  ) => void;
   clearSelection: () => void;
   isGiven: (row: number, col: number) => boolean;
 };
@@ -75,6 +82,8 @@ function createInitialState() {
     elapsedSeconds: 0,
     history: [] as HistoryEntry[],
     lastRecognition: null as { digit: number; confidence: number } | null,
+    gameMode: "free" as const,
+    storyLevel: null as number | null,
   };
 }
 
@@ -183,6 +192,28 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   resetGame: () => set(createInitialState()),
+
+  loadPuzzle: (initialGrid, solutionGrid, options) => {
+    const grid = cloneGrid(initialGrid);
+    set({
+      initialGrid: cloneGrid(initialGrid),
+      solutionGrid: cloneGrid(solutionGrid),
+      grid,
+      notes: emptyNotes(),
+      selectedCell: null,
+      mistakes: 0,
+      hintsUsed: 0,
+      isComplete: false,
+      isPaused: false,
+      notesMode: false,
+      startedAt: Date.now(),
+      elapsedSeconds: 0,
+      history: [],
+      lastRecognition: null,
+      gameMode: options?.gameMode ?? "free",
+      storyLevel: options?.storyLevel ?? null,
+    });
+  },
 
   clearSelection: () => set({ selectedCell: null }),
 

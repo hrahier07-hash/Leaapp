@@ -10,15 +10,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Sudoku Quest",
-    template: "%s | Sudoku Quest",
+    default: "LeaDoku",
+    template: "%s | LeaDoku",
   },
   description:
     "Sudoku mobile gamifié. Dessine les chiffres avec ton doigt et progresse.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Sudoku Quest",
+    title: "LeaDoku",
   },
 };
 
