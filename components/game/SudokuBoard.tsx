@@ -49,7 +49,7 @@ export function SudokuBoard() {
 
   return (
     <div className={cn("mx-auto w-full max-w-[min(100%,22rem)] select-none touch-none", isPaused && "opacity-50 pointer-events-none")}>
-      <div className="grid grid-cols-9 overflow-hidden rounded-2xl border-2 border-violet-300 bg-white shadow-md">
+      <div className="grid grid-cols-9 overflow-hidden rounded-2xl border-2 border-border bg-card shadow-sm">
         {grid.map((row, rowIndex) =>
           row.map((value, colIndex) => {
             const key = `${rowIndex}-${colIndex}`;
@@ -87,7 +87,7 @@ export function SudokuBoard() {
                 {value !== 0 ? (
                   value
                 ) : cellNotes.length > 0 ? (
-                  <span className="grid h-full w-full grid-cols-3 gap-0 p-0.5 text-[8px] leading-none text-violet-600">
+                  <span className="grid h-full w-full grid-cols-3 gap-0 p-0.5 text-[8px] leading-none text-muted-foreground">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
                       <span key={n} className="flex items-center justify-center">
                         {cellNotes.includes(n) ? n : ""}

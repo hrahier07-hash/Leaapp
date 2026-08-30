@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/providers/Providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,7 +28,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#7c3aed",
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({
@@ -40,9 +39,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Providers>
-          <div className="mobile-frame">{children}</div>
-        </Providers>
+        <div className="mobile-frame">{children}</div>
       </body>
     </html>
   );

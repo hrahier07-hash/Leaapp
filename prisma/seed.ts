@@ -14,37 +14,53 @@ const prisma = new PrismaClient();
 const TECHNIQUES = [
   {
     slug: "naked-single",
-    name: "Candidat unique",
-    description: "Une case n'a qu'un seul chiffre possible.",
+    name: "Case évidente",
+    description: "Une case n'accepte qu'un seul chiffre.",
     unitOrder: 1,
   },
   {
     slug: "hidden-single",
-    name: "Candidat caché",
-    description: "Un chiffre ne peut aller que dans une case d'une zone.",
+    name: "Chiffre caché",
+    description: "Un chiffre ne va que dans une case de la ligne.",
     unitOrder: 2,
   },
   {
     slug: "naked-pair",
     name: "Paire nue",
-    description: "Deux cases partagent exactement deux candidats.",
+    description: "Deux cases avec les mêmes deux chiffres possibles.",
     unitOrder: 3,
   },
   {
     slug: "pointing-pair",
-    name: "Réduction bloc",
-    description: "Un chiffre dans un bloc élimine des candidats ailleurs.",
+    name: "Bloc et ligne",
+    description: "Un chiffre d'un bloc élimine des cases ailleurs.",
     unitOrder: 4,
   },
   {
     slug: "x-wing",
-    name: "X Wing",
-    description: "Alignement de candidats sur deux lignes et colonnes.",
+    name: "Aile en X",
+    description: "Un chiffre aligné sur deux lignes.",
     unitOrder: 5,
   },
 ];
 
 async function main() {
+  await prisma.user.upsert({
+    where: { email: "joueur@sudoku-quest.app" },
+    update: {},
+    create: {
+      email: "joueur@sudoku-quest.app",
+      name: "Joueur Sudoku",
+      hearts: 5,
+      hints: 5,
+      gems: 0,
+      totalXp: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      onboardingDone: true,
+    },
+  });
+
   for (const t of TECHNIQUES) {
     await prisma.technique.upsert({
       where: { slug: t.slug },

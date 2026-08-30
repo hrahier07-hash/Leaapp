@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { auth } from "@/lib/auth";
 import { computeXpForCompletion, updateStreak } from "@/lib/gamification/xp";
 import { prisma } from "@/lib/db/client";
+import { getOrCreateSharedUser } from "@/lib/user/shared-user";
 import type { Difficulty } from "@/lib/sudoku/types";
 
 export async function POST(request: Request) {
-  const session = await auth();
   const body = (await request.json()) as {
     puzzleTemplateId?: string;
     difficulty?: Difficulty;
@@ -22,45 +21,65 @@ export async function POST(request: Request) {
     hintsUsed: body.hintsUsed ?? 0,
   });
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ xp, saved: false });
-  }
+  try {
+    const user = await getOrCreateSharedUser();
 
-  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (!user) {
-    return NextResponse.json({ xp, saved: false });
-  }
+    const streak = updateStreak(
+      user.currentStreak,
+      user.longestStreak,
+      user.lastActivityDate,
+      user.timezone,
+    );
 
-  const streak = updateStreak(
-    user.currentStreak,
-    user.longestStreak,
-    user.lastActivityDate,
-    user.timezone,
-  );
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      totalXp: user.totalXp + xp,
-      currentStreak: streak.currentStreak,
-      longestStreak: streak.longestStreak,
-      lastActivityDate: streak.lastActivityDate,
-    },
-  });
-
-  if (body.puzzleTemplateId) {
-    await prisma.userPuzzleAttempt.create({
+    await prisma.user.update({
+      where: { id: user.id },
       data: {
-        userId: user.id,
-        puzzleTemplateId: body.puzzleTemplateId,
-        completedAt: new Date(),
-        timeSpentSeconds: body.timeSeconds,
-        mistakesCount: body.mistakesCount ?? 0,
-        hintsUsed: body.hintsUsed ?? 0,
-        xpEarned: xp,
+        totalXp: user.totalXp + xp,
+        currentStreak: streak.currentStreak,
+        longestStreak: streak.longestStreak,
+        lastActivityDate: streak.lastActivityDate,
+        hints: Math.max(0, user.hints - (body.hintsUsed ?? 0)),
       },
     });
-  }
 
-  return NextResponse.json({ xp, saved: true, streak: streak.currentStreak });
+    if (body.puzzleTemplateId) {
+      await prisma.userPuzzleAttempt.create({
+        data: {
+          userId: user.id,
+          puzzleTemplateId: body.puzzleTemplateId,
+          completedAt: new Date(),
+          timeSpentSeconds: body.timeSeconds,
+          mistakesCount: body.mistakesCount ?? 0,
+          hintsUsed: body.hintsUsed ?? 0,
+          xpEarned: xp,
+        },
+      });
+    } else {
+      const template = await prisma.puzzleTemplate.findFirst({
+        where: { difficulty: body.difficulty ?? "facile" },
+      });
+      if (template) {
+        await prisma.userPuzzleAttempt.create({
+          data: {
+            userId: user.id,
+            puzzleTemplateId: template.id,
+            completedAt: new Date(),
+            timeSpentSeconds: body.timeSeconds,
+            mistakesCount: body.mistakesCount ?? 0,
+            hintsUsed: body.hintsUsed ?? 0,
+            xpEarned: xp,
+          },
+        });
+      }
+    }
+
+    return NextResponse.json({
+      xp,
+      saved: true,
+      streak: streak.currentStreak,
+      totalXp: user.totalXp + xp,
+    });
+  } catch {
+    return NextResponse.json({ xp, saved: false });
+  }
 }

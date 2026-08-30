@@ -1,51 +1,46 @@
 "use client";
 
-import { Flame, Gem, Heart, Sparkles } from "lucide-react";
+import { Flame, Heart, Lightbulb } from "lucide-react";
 
+import { useSharedUser } from "@/hooks/useSharedUser";
 import { cn } from "@/lib/utils";
 
 type TopBarProps = {
-  hearts?: number;
-  hints?: number;
-  gems?: number;
-  streak?: number;
-  dailyXp?: number;
   className?: string;
 };
 
-export function TopBar({
-  hearts = 5,
-  hints = 5,
-  gems = 0,
-  streak = 0,
-  dailyXp = 0,
-  className,
-}: TopBarProps) {
-  const items = [
-    { icon: Heart, value: hearts, color: "text-rose-500", label: "Cœurs" },
-    { icon: Sparkles, value: hints, color: "text-sky-500", label: "Indices" },
-    { icon: Gem, value: gems, color: "text-fuchsia-500", label: "Gemmes" },
-    { icon: Flame, value: streak, color: "text-orange-500", label: "Streak" },
-  ];
+export function TopBar({ className }: TopBarProps) {
+  const { profile, loading } = useSharedUser();
+
+  const hearts = profile?.hearts ?? 5;
+  const hints = profile?.hints ?? 5;
+  const streak = profile?.currentStreak ?? 0;
+  const xp = profile?.totalXp ?? 0;
 
   return (
     <div
       className={cn(
-        "flex items-center justify-between rounded-2xl bg-white/90 px-3 py-2 shadow-sm ring-1 ring-violet-100",
+        "flex items-center justify-between surface-card px-3 py-2.5",
         className,
       )}
     >
-      <div className="flex items-center gap-3">
-        {items.map(({ icon: Icon, value, color, label }) => (
-          <div key={label} className="flex items-center gap-1" title={label}>
-            <Icon className={cn("size-4", color)} />
-            <span className="text-sm font-bold">{value}</span>
-          </div>
-        ))}
+      <div className="flex items-center gap-4 text-sm">
+        <span className="flex items-center gap-1" title="Vies">
+          <Heart className="size-4 text-muted-foreground" />
+          <strong>{loading ? "…" : hearts}</strong>
+        </span>
+        <span className="flex items-center gap-1" title="Indices">
+          <Lightbulb className="size-4 text-muted-foreground" />
+          <strong>{loading ? "…" : hints}</strong>
+        </span>
+        <span className="flex items-center gap-1" title="Jours d'affilée">
+          <Flame className="size-4 text-muted-foreground" />
+          <strong>{loading ? "…" : streak}</strong>
+        </span>
       </div>
-      <div className="rounded-full bg-violet-100 px-2.5 py-1 text-xs font-bold text-primary">
-        +{dailyXp} XP
-      </div>
+      <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold">
+        {loading ? "…" : `${xp} pts`}
+      </span>
     </div>
   );
 }

@@ -2,23 +2,66 @@
 
 import { MobileShell } from "@/components/layout/MobileShell";
 import { Mascot } from "@/components/gamification/Mascot";
+import { useSharedUser } from "@/hooks/useSharedUser";
 
 export default function ProfilPage() {
+  const { profile, loading, error } = useSharedUser();
+
+  if (loading) {
+    return (
+      <MobileShell title="Profil">
+        <p className="py-8 text-center text-sm text-muted-foreground">Chargement…</p>
+      </MobileShell>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <MobileShell title="Profil">
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          Les stats ne sont pas disponibles. Vérifie la base de données.
+        </p>
+      </MobileShell>
+    );
+  }
+
   return (
     <MobileShell title="Profil">
       <div className="space-y-4 py-2">
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-violet-100">
-          <p className="text-lg font-bold">Joueur invité</p>
-          <p className="text-sm text-muted-foreground">Connecte toi pour sauvegarder</p>
+        <div className="surface-card p-4">
+          <p className="text-lg font-bold">{profile.name ?? "Joueur Sudoku"}</p>
+          <p className="text-sm text-muted-foreground">
+            Compte partagé. Ta progression est sauvegardée ici.
+          </p>
         </div>
+
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="rounded-xl bg-violet-50 p-3"><p className="text-xs text-muted-foreground">XP total</p><p className="text-xl font-bold">1 240</p></div>
-          <div className="rounded-xl bg-orange-50 p-3"><p className="text-xs text-muted-foreground">Meilleur streak</p><p className="text-xl font-bold">12</p></div>
-          <div className="rounded-xl bg-emerald-50 p-3"><p className="text-xs text-muted-foreground">Grilles</p><p className="text-xl font-bold">47</p></div>
-          <div className="rounded-xl bg-sky-50 p-3"><p className="text-xs text-muted-foreground">Badges</p><p className="text-xl font-bold">3</p></div>
+          <Stat label="Points total" value={profile.totalXp} />
+          <Stat label="Jours d'affilée" value={profile.currentStreak} />
+          <Stat label="Meilleure série" value={profile.longestStreak} />
+          <Stat label="Grilles finies" value={profile.puzzlesCompleted} />
+          <Stat label="Vies restantes" value={profile.hearts} />
+          <Stat label="Indices restants" value={profile.hints} />
         </div>
-        <Mascot mood="proud" message="Tu progresses vite. Continue comme ça." />
+
+        <Mascot
+          mood="proud"
+          message={
+            profile.puzzlesCompleted > 0
+              ? `Tu as fini ${profile.puzzlesCompleted} grille${profile.puzzlesCompleted > 1 ? "s" : ""}. Bravo !`
+              : "Finis ta première grille pour gagner des points."
+          }
+        />
       </div>
     </MobileShell>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="surface-card p-3">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-xl font-bold">{value}</p>
+    </div>
   );
 }

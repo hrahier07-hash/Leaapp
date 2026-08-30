@@ -31,7 +31,7 @@ export function GameHUD() {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-violet-100">
+      <div className="flex items-center justify-between surface-card px-4 py-3">
         <div className="text-sm">
           <span className="font-bold">{formatTime(elapsedSeconds)}</span>
           <span className="mx-2 text-muted-foreground">·</span>
@@ -44,7 +44,7 @@ export function GameHUD() {
           <button type="button" onClick={undo} className="flex size-10 items-center justify-center rounded-full bg-muted active:scale-95" aria-label="Annuler">
             <Undo2 className="size-4" />
           </button>
-          <button type="button" onClick={useHint} className="flex size-10 items-center justify-center rounded-full bg-amber-100 text-amber-700 active:scale-95" aria-label="Indice">
+          <button type="button" onClick={useHint} className="flex size-10 items-center justify-center rounded-full bg-muted active:scale-95" aria-label="Indice">
             <Lightbulb className="size-4" />
           </button>
           <button

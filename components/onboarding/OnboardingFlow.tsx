@@ -15,15 +15,15 @@ import {
 } from "@/store/useOnboardingStore";
 
 const MOTIVATIONS: { id: Motivation; label: string; emoji: string }[] = [
-  { id: "relax", label: "Détente", emoji: "🌿" },
-  { id: "performance", label: "Performance", emoji: "🎯" },
-  { id: "competition", label: "Compétition", emoji: "🏆" },
+  { id: "relax", label: "Me détendre", emoji: "🌿" },
+  { id: "performance", label: "M'améliorer", emoji: "🎯" },
+  { id: "competition", label: "Me challenger", emoji: "🏆" },
 ];
 
 const GOALS: { id: DailyGoal; label: string }[] = [
   { id: "one", label: "1 grille" },
   { id: "three", label: "3 grilles" },
-  { id: "unlimited", label: "Illimité" },
+  { id: "unlimited", label: "Autant que je veux" },
 ];
 
 export function OnboardingFlow() {
@@ -37,7 +37,6 @@ export function OnboardingFlow() {
     startingLevel,
     motivation,
     dailyGoal,
-    lessonCompleted,
     recordLevelTest,
   } = useOnboardingStore();
 
@@ -68,9 +67,9 @@ export function OnboardingFlow() {
           {step === 1 && (
             <>
               <Mascot mood="encouraging" message={getMascotLine("onboarding", "levelTest")} />
-              <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-violet-100">
-                <p className="text-sm text-muted-foreground">Test rapide simulé</p>
-                <p className="mt-2 text-lg font-bold">Niveau estimé après test</p>
+              <div className="surface-card p-4">
+                <p className="text-sm text-muted-foreground">Petit test pour voir ton niveau</p>
+                <p className="mt-2 text-lg font-bold">On estime ton niveau après le test</p>
               </div>
               <div className="mt-auto flex gap-2">
                 <button type="button" onClick={prevStep} className={cn(buttonVariants({ variant: "outline" }), "flex-1")}>
@@ -94,7 +93,7 @@ export function OnboardingFlow() {
                     onClick={() => setMotivation(m.id)}
                     className={cn(
                       "rounded-2xl border-2 px-4 py-4 text-left font-semibold active:scale-[0.98]",
-                      motivation === m.id ? "border-primary bg-violet-50" : "border-transparent bg-white shadow-sm",
+                      motivation === m.id ? "border-primary bg-accent" : "border-transparent surface-card",
                     )}
                   >
                     {m.emoji} {m.label}
@@ -118,7 +117,7 @@ export function OnboardingFlow() {
                     onClick={() => setDailyGoal(g.id)}
                     className={cn(
                       "rounded-2xl border-2 px-4 py-4 font-semibold active:scale-[0.98]",
-                      dailyGoal === g.id ? "border-primary bg-violet-50" : "border-transparent bg-white shadow-sm",
+                      dailyGoal === g.id ? "border-primary bg-accent" : "border-transparent surface-card",
                     )}
                   >
                     {g.label}
@@ -134,9 +133,9 @@ export function OnboardingFlow() {
           {step === 4 && (
             <>
               <Mascot mood="proud" message={getMascotLine("onboarding", "lesson")} />
-              <div className="grid grid-cols-4 gap-1 rounded-2xl bg-white p-4 shadow-sm">
+              <div className="grid grid-cols-4 gap-1 surface-card p-4">
                 {[1, 2, 0, 3, 0, 4, 3, 1, 2, 0, 1, 0, 4, 0, 2, 3].map((v, i) => (
-                  <div key={i} className="flex aspect-square items-center justify-center rounded-lg bg-violet-50 text-lg font-bold">
+                  <div key={i} className="flex aspect-square items-center justify-center rounded-lg bg-muted text-lg font-bold">
                     {v || ""}
                   </div>
                 ))}
@@ -150,17 +149,12 @@ export function OnboardingFlow() {
           {step === 5 && (
             <>
               <Mascot mood="proud" message={getMascotLine("onboarding", "summary")} />
-              <div className="rounded-2xl bg-emerald-50 p-4 text-sm ring-1 ring-emerald-100">
-                <p>Niveau de départ : <strong>{startingLevel}</strong></p>
-                <p>Motivation : <strong>{motivation}</strong></p>
-                <p>Objectif : <strong>{dailyGoal}</strong></p>
-                <p>Leçon : <strong>{lessonCompleted ? "validée" : "en cours"}</strong></p>
+              <div className="surface-card space-y-1 p-4 text-sm">
+                <p>Niveau : <strong>{startingLevel}</strong></p>
+                <p>Objectif : <strong>{dailyGoal === "one" ? "1 grille" : dailyGoal === "three" ? "3 grilles" : "Autant que tu veux"}</strong></p>
               </div>
-              <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "mt-auto w-full")}>
-                Créer mon compte
-              </Link>
-              <Link href="/app" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full")}>
-                Jouer sans compte
+              <Link href="/app" className={cn(buttonVariants({ size: "lg" }), "mt-auto w-full")}>
+                Aller jouer
               </Link>
             </>
           )}

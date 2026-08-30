@@ -130,7 +130,7 @@ export function DrawPad() {
 
     const rawStrokes = strokesRef.current;
     if (!rawStrokes.some((s) => s.length > 2)) {
-      setHint("Trait trop court — dessine plus grand");
+      setHint("Trait trop court. Dessine plus grand.");
       return;
     }
 
@@ -142,7 +142,7 @@ export function DrawPad() {
       const result = await recognizeDigitAsync(smoothed, width, height);
 
       if (result.digit === null) {
-        setHint("Non reconnu — réessaie ou utilise le clavier");
+        setHint("Pas reconnu. Réessaie ou utilise le clavier.");
         setLastRecognition(null, result.confidence);
         return;
       }

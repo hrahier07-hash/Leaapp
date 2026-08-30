@@ -1,27 +1,26 @@
 export const MASCOT_LINES = {
   welcome: [
-    "Salut ! Prêt à devenir un maître du Sudoku ?",
-    "Chaque grille te rapproche de la couronne.",
+    "Salut ! On remplit la grille ensemble ?",
+    "Chaque grille te rend plus fort au Sudoku.",
   ],
   onboarding: {
-    hook: "Le Sudoku, mais tu progresses vraiment.",
-    levelTest: "Montre moi ton niveau avec cette grille.",
-    motivation: "Quel est ton objectif principal ?",
+    hook: "Apprends le Sudoku pas à pas.",
+    levelTest: "Résous quelques cases pour voir ton niveau.",
+    motivation: "Tu joues surtout pour…",
     dailyGoal: "Combien de grilles par jour ?",
-    lesson: "Regarde cette paire nue sur la mini grille.",
-    summary: "Tu maîtrises déjà une vraie technique !",
-    signup: "Crée ton compte pour sauvegarder ta progression.",
+    lesson: "Ici, deux cases ne peuvent prendre que deux chiffres.",
+    summary: "Tu connais déjà la paire nue. Bien joué !",
   },
   game: {
-    goodMove: "Bien joué !",
-    mistake: "Oups, ce n'est pas le bon chiffre.",
-    hint: "Voici un indice logique.",
-    complete: "Grille terminée ! Tu es incroyable.",
-    streak: "Ta flamme brille encore aujourd'hui.",
+    goodMove: "Bon chiffre !",
+    mistake: "Ce chiffre ne va pas ici.",
+    hint: "Regarde cette case.",
+    complete: "Grille finie !",
+    streak: "Tu as joué plusieurs jours d'affilée.",
   },
   empty: {
-    leaderboard: "Sois le premier à compléter le défi du jour.",
-    badges: "Termine des grilles pour débloquer des badges.",
+    leaderboard: "Personne n'a fini la grille du jour.",
+    badges: "Finis des grilles pour gagner des badges.",
   },
 } as const;
 
@@ -45,5 +44,5 @@ export function getMascotLine(
     const lines = block[sub as keyof typeof block];
     if (typeof lines === "string") return lines;
   }
-  return "Continue, tu progresses !";
+  return "Continue, tu y es presque.";
 }
