@@ -1,5 +1,13 @@
 export * from "./types";
 export * from "./validate";
+export * from "./grid-utils";
+export * from "./candidates";
+export * from "./solver";
+export * from "./generator";
+export * from "./classifier";
+export * from "./hint";
+export * from "./techniques";
+export * from "./fixtures";
 export * from "./digit-recognizer";
 export * from "./stroke-renderer";
 export { SAMPLE_PUZZLE, SAMPLE_SOLUTION } from "./sample-puzzle";

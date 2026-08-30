@@ -14,8 +14,16 @@ export function NumberPad() {
   const clearCell = useGameStore((s) => s.clearCell);
   const setLastRecognition = useGameStore((s) => s.setLastRecognition);
 
+  const notesMode = useGameStore((s) => s.notesMode);
+  const toggleNote = useGameStore((s) => s.toggleNote);
+
   const handleDigit = (digit: (typeof DIGITS)[number]) => {
     if (!selectedCell) return;
+
+    if (notesMode) {
+      toggleNote(selectedCell.row, selectedCell.col, digit);
+      return;
+    }
 
     const isValid = setCellValue(selectedCell.row, selectedCell.col, digit);
     setLastRecognition(digit, isValid ? 100 : 100);

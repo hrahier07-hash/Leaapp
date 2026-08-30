@@ -7,30 +7,47 @@
     "build": "prisma generate && next build --turbopack",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.3",
     "@base-ui/react": "^1.0.0",
     "@prisma/client": "^6.19.3",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/web-push": "^3.6.4",
+    "@upstash/redis": "^1.38.3",
+    "@vercel/og": "^1.0.2",
+    "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^13.1.1",
     "lucide-react": "^0.511.0",
     "next": "15.5.24",
+    "next-auth": "^5.0.0-beta.32",
     "perfect-freehand": "^1.2.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "resend": "^6.25.0",
     "shadcn": "^4.19.0",
+    "stripe": "^22.6.0",
     "tailwind-merge": "^3.3.0",
     "tw-animate-css": "^1.3.4",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -39,6 +56,9 @@
     "eslint-config-next": "15.5.24",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.20.5",
+    "typescript": "^5",
+    "vitest": "^3.2.4",
+    "web-push": "^3.6.7"
   }
 }

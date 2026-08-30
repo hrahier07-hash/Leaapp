@@ -5,9 +5,5 @@ export default function MarketingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <MobileShell title="Sudoku Quest" showNav={false}>
-      {children}
-    </MobileShell>
-  );
+  return <MobileShell title="Sudoku Quest" showNav={false}>{children}</MobileShell>;
 }

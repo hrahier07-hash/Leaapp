@@ -31,9 +31,11 @@ function getRelatedCells(
 
 export function SudokuBoard() {
   const grid = useGameStore((s) => s.grid);
+  const notes = useGameStore((s) => s.notes);
   const selectedCell = useGameStore((s) => s.selectedCell);
   const selectCell = useGameStore((s) => s.selectCell);
   const isGiven = useGameStore((s) => s.isGiven);
+  const isPaused = useGameStore((s) => s.isPaused);
 
   const selectedValue =
     selectedCell !== null
@@ -46,11 +48,12 @@ export function SudokuBoard() {
       : new Set<string>();
 
   return (
-    <div className="mx-auto w-full max-w-[min(100%,22rem)] select-none touch-none">
-      <div className="grid grid-cols-9 overflow-hidden rounded-2xl border-2 border-foreground/80 bg-card shadow-sm">
+    <div className={cn("mx-auto w-full max-w-[min(100%,22rem)] select-none touch-none", isPaused && "opacity-50 pointer-events-none")}>
+      <div className="grid grid-cols-9 overflow-hidden rounded-2xl border-2 border-violet-300 bg-white shadow-md">
         {grid.map((row, rowIndex) =>
           row.map((value, colIndex) => {
             const key = `${rowIndex}-${colIndex}`;
+            const cellNotes = notes[rowIndex][colIndex];
             const isSelected =
               selectedCell?.row === rowIndex &&
               selectedCell?.col === colIndex;
@@ -81,7 +84,19 @@ export function SudokuBoard() {
                   sameValue && "bg-primary/10 text-primary",
                 )}
               >
-                {value !== 0 ? value : ""}
+                {value !== 0 ? (
+                  value
+                ) : cellNotes.length > 0 ? (
+                  <span className="grid h-full w-full grid-cols-3 gap-0 p-0.5 text-[8px] leading-none text-violet-600">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                      <span key={n} className="flex items-center justify-center">
+                        {cellNotes.includes(n) ? n : ""}
+                      </span>
+                    ))}
+                  </span>
+                ) : (
+                  ""
+                )}
               </motion.button>
             );
           }),

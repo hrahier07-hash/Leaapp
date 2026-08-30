@@ -1,5 +1,5 @@
-import { GameScreen } from "@/components/game/GameScreen";
+import { DashboardScreen } from "@/components/app/DashboardScreen";
 
-export default function PlayPage() {
-  return <GameScreen />;
+export default function AppDashboardPage() {
+  return <DashboardScreen />;
 }

@@ -1,23 +1,43 @@
 import { create } from "zustand";
 
-import { SAMPLE_PUZZLE } from "@/lib/sudoku/sample-puzzle";
+import { SAMPLE_PUZZLE, SAMPLE_SOLUTION } from "@/lib/sudoku/sample-puzzle";
+import { getHint } from "@/lib/sudoku/hint";
 import type { CellValue, Grid } from "@/lib/sudoku/types";
 import { EMPTY } from "@/lib/sudoku/types";
 import { isGridComplete, validateMove } from "@/lib/sudoku/validate";
 
 type SelectedCell = { row: number; col: number } | null;
+type NotesGrid = number[][][];
+
+type HistoryEntry = {
+  grid: Grid;
+  notes: NotesGrid;
+};
 
 type GameState = {
   initialGrid: Grid;
+  solutionGrid: Grid;
   grid: Grid;
+  notes: NotesGrid;
   selectedCell: SelectedCell;
   mistakes: number;
+  hintsUsed: number;
   isComplete: boolean;
+  isPaused: boolean;
+  notesMode: boolean;
+  startedAt: number | null;
+  elapsedSeconds: number;
+  history: HistoryEntry[];
   lastRecognition: { digit: number; confidence: number } | null;
   selectCell: (row: number, col: number) => void;
-  clearSelection: () => void;
+  toggleNotesMode: () => void;
+  togglePause: () => void;
+  tick: () => void;
   setCellValue: (row: number, col: number, value: CellValue) => boolean;
+  toggleNote: (row: number, col: number, value: number) => void;
   clearCell: (row: number, col: number) => void;
+  undo: () => void;
+  useHint: () => boolean;
   setLastRecognition: (digit: number | null, confidence: number) => void;
   resetGame: () => void;
   isGiven: (row: number, col: number) => boolean;
@@ -27,14 +47,32 @@ function cloneGrid(grid: Grid): Grid {
   return grid.map((row) => [...row]);
 }
 
+function emptyNotes(): NotesGrid {
+  return Array.from({ length: 9 }, () =>
+    Array.from({ length: 9 }, () => [] as number[]),
+  );
+}
+
+function cloneNotes(notes: NotesGrid): NotesGrid {
+  return notes.map((row) => row.map((cell) => [...cell]));
+}
+
 function createInitialState() {
   const initialGrid = cloneGrid(SAMPLE_PUZZLE);
   return {
     initialGrid,
+    solutionGrid: cloneGrid(SAMPLE_SOLUTION),
     grid: cloneGrid(initialGrid),
+    notes: emptyNotes(),
     selectedCell: null as SelectedCell,
     mistakes: 0,
+    hintsUsed: 0,
     isComplete: false,
+    isPaused: false,
+    notesMode: false,
+    startedAt: Date.now(),
+    elapsedSeconds: 0,
+    history: [] as HistoryEntry[],
     lastRecognition: null as { digit: number; confidence: number } | null,
   };
 }
@@ -47,20 +85,34 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ selectedCell: { row, col } });
   },
 
-  clearSelection: () => set({ selectedCell: null }),
+  toggleNotesMode: () => set({ notesMode: !get().notesMode }),
+  togglePause: () => set({ isPaused: !get().isPaused }),
+
+  tick: () => {
+    const { isPaused, isComplete, startedAt } = get();
+    if (isPaused || isComplete || !startedAt) return;
+    set({ elapsedSeconds: Math.floor((Date.now() - startedAt) / 1000) });
+  },
 
   setCellValue: (row, col, value) => {
-    const { initialGrid, grid } = get();
-    if (initialGrid[row][col] !== EMPTY) return false;
+    const state = get();
+    if (state.initialGrid[row][col] !== EMPTY) return false;
     if (value === EMPTY) return false;
 
-    const isValid = validateMove(grid, row, col, value);
-    const nextGrid = cloneGrid(grid);
+    const isValid = validateMove(state.grid, row, col, value);
+    const nextGrid = cloneGrid(state.grid);
     nextGrid[row][col] = value;
+    const nextNotes = cloneNotes(state.notes);
+    nextNotes[row][col] = [];
 
     set({
+      history: [
+        ...state.history,
+        { grid: cloneGrid(state.grid), notes: cloneNotes(state.notes) },
+      ],
       grid: nextGrid,
-      mistakes: isValid ? get().mistakes : get().mistakes + 1,
+      notes: nextNotes,
+      mistakes: isValid ? state.mistakes : state.mistakes + 1,
       isComplete: isGridComplete(nextGrid),
       selectedCell: { row, col },
     });
@@ -68,14 +120,58 @@ export const useGameStore = create<GameState>((set, get) => ({
     return isValid;
   },
 
+  toggleNote: (row, col, value) => {
+    const state = get();
+    if (state.initialGrid[row][col] !== EMPTY) return;
+    const nextNotes = cloneNotes(state.notes);
+    const cell = nextNotes[row][col];
+    if (cell.includes(value)) {
+      nextNotes[row][col] = cell.filter((n) => n !== value);
+    } else {
+      nextNotes[row][col] = [...cell, value].sort();
+    }
+    set({ notes: nextNotes, selectedCell: { row, col } });
+  },
+
   clearCell: (row, col) => {
-    const { initialGrid, grid } = get();
-    if (initialGrid[row][col] !== EMPTY) return;
-
-    const nextGrid = cloneGrid(grid);
+    const state = get();
+    if (state.initialGrid[row][col] !== EMPTY) return;
+    const nextGrid = cloneGrid(state.grid);
     nextGrid[row][col] = EMPTY;
+    const nextNotes = cloneNotes(state.notes);
+    nextNotes[row][col] = [];
+    set({
+      history: [
+        ...state.history,
+        { grid: cloneGrid(state.grid), notes: cloneNotes(state.notes) },
+      ],
+      grid: nextGrid,
+      notes: nextNotes,
+      isComplete: false,
+    });
+  },
 
-    set({ grid: nextGrid, isComplete: false });
+  undo: () => {
+    const { history } = get();
+    if (history.length === 0) return;
+    const prev = history[history.length - 1];
+    set({
+      grid: cloneGrid(prev.grid),
+      notes: cloneNotes(prev.notes),
+      history: history.slice(0, -1),
+      isComplete: isGridComplete(prev.grid),
+    });
+  },
+
+  useHint: () => {
+    const state = get();
+    if (state.hintsUsed >= 5) return false;
+    const hint = getHint(state.grid, state.solutionGrid);
+    if (!hint || hint.kind !== "placement") return false;
+
+    get().setCellValue(hint.row, hint.col, hint.value);
+    set({ hintsUsed: state.hintsUsed + 1 });
+    return true;
   },
 
   setLastRecognition: (digit, confidence) => {
