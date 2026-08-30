@@ -1,11 +1,7 @@
-export default function AppLayout({
+export default function AppGroupLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <div className="min-h-screen bg-background">
-      {children}
-    </div>
-  );
+  return children;
 }

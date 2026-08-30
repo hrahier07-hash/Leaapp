@@ -4,31 +4,28 @@ import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
   return (
-    <section className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-5xl flex-col items-center justify-center gap-8 px-4 py-16 text-center">
+    <section className="flex min-h-[calc(100dvh-5rem)] flex-col items-center justify-center gap-8 py-8 text-center">
       <div className="space-y-4">
         <p className="text-sm font-medium uppercase tracking-widest text-primary">
-          Sudoku gamifié
+          Sudoku mobile
         </p>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          Le Sudoku, mais tu progresses vraiment
-        </h1>
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          Parcours pédagogique de techniques, XP, streaks, ligues et une
-          mascotte pour t&apos;accompagner — dans l&apos;esprit de Duolingo.
+        <h2 className="text-3xl font-bold tracking-tight">
+          Dessine les chiffres avec ton doigt
+        </h2>
+        <p className="text-base text-muted-foreground">
+          App optimisée pour téléphone. Touche une case, dessine le chiffre en
+          bas de l&apos;écran — l&apos;app le reconnaît automatiquement.
         </p>
       </div>
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Link
-          href="/onboarding"
-          className={cn(buttonVariants({ size: "lg" }))}
-        >
-          Commencer gratuitement
+      <div className="flex w-full max-w-xs flex-col gap-3">
+        <Link href="/app" className={cn(buttonVariants({ size: "lg" }), "h-12")}>
+          Jouer maintenant
         </Link>
         <Link
-          href="/login"
-          className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
+          href="/onboarding"
+          className={cn(buttonVariants({ size: "lg", variant: "outline" }), "h-12")}
         >
-          J&apos;ai déjà un compte
+          Découvrir le parcours
         </Link>
       </div>
     </section>

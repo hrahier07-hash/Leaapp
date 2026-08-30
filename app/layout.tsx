@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -18,7 +18,21 @@ export const metadata: Metadata = {
     template: "%s | Sudoku Quest",
   },
   description:
-    "Sudoku gamifié : parcours pédagogique de techniques, XP, streaks et ligues.",
+    "Sudoku mobile gamifié — dessine les chiffres avec ton doigt.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Sudoku Quest",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -31,7 +45,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="mobile-frame">{children}</div>
       </body>
     </html>
   );
