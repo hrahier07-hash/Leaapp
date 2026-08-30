@@ -36,7 +36,7 @@ export function PathMap({ nodes = LESSONS }: { nodes?: PathNode[] }) {
     <div className="flex flex-col items-center gap-5 py-2">
       {nodes.map((node, index) => {
         const offset = index % 2 === 0 ? "translate-x-0" : index % 4 === 1 ? "-translate-x-8" : "translate-x-8";
-        const href = node.status === "locked" ? undefined : `/app/jouer?technique=${node.slug}`;
+        const href = node.status === "locked" ? undefined : `/app/lecon/${node.slug}`;
 
         const circle = (
           <motion.div

@@ -22,6 +22,10 @@ export function DashboardScreen() {
 
         <PathMap />
 
+        <p className="text-center text-xs text-muted-foreground">
+          Touche une leçon pour voir comment faire, étape par étape.
+        </p>
+
         <QuickPlayBanner />
 
         <Mascot mood="encouraging" message="La leçon Paire nue est prête. Une case en moins à chercher !" />

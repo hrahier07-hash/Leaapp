@@ -14,7 +14,8 @@ import type { Point, Stroke } from "@/lib/sudoku/types";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/useGameStore";
 
-const STROKE_SIZE = 16;
+const STROKE_SIZE_INLINE = 16;
+const STROKE_SIZE_SHEET = 22;
 
 function getCanvasPoint(
   canvas: HTMLCanvasElement,
@@ -33,6 +34,7 @@ function drawStrokes(
   strokes: Stroke[],
   width: number,
   height: number,
+  strokeSize: number,
 ) {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "#ffffff";
@@ -45,7 +47,7 @@ function drawStrokes(
       stroke.length >= 2
         ? getStroke(
             stroke.map((p) => [p.x, p.y]),
-            { size: STROKE_SIZE, thinning: 0.65, smoothing: 0.65, streamline: 0.4 },
+            { size: strokeSize, thinning: 0.65, smoothing: 0.65, streamline: 0.4 },
           )
         : [];
 
@@ -61,13 +63,19 @@ function drawStrokes(
     } else if (stroke.length === 1) {
       ctx.fillStyle = "#111111";
       ctx.beginPath();
-      ctx.arc(stroke[0].x, stroke[0].y, STROKE_SIZE / 2, 0, Math.PI * 2);
+      ctx.arc(stroke[0].x, stroke[0].y, strokeSize / 2, 0, Math.PI * 2);
       ctx.fill();
     }
   }
 }
 
-export function DrawPad() {
+export function DrawPad({
+  variant = "inline",
+  onDone,
+}: {
+  variant?: "inline" | "sheet";
+  onDone?: () => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const strokesRef = useRef<Stroke[]>([]);
   const drawingRef = useRef(false);
@@ -87,6 +95,8 @@ export function DrawPad() {
     preloadDigitModel();
   }, []);
 
+  const strokeSize = variant === "sheet" ? STROKE_SIZE_SHEET : STROKE_SIZE_INLINE;
+
   const redraw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -101,8 +111,8 @@ export function DrawPad() {
     canvas.height = height * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    drawStrokes(ctx, strokesRef.current, width, height);
-  }, []);
+    drawStrokes(ctx, strokesRef.current, width, height, strokeSize);
+  }, [strokeSize]);
 
   useEffect(() => {
     redraw();
@@ -161,10 +171,11 @@ export function DrawPad() {
       );
 
       clearCanvas();
+      if (isValid) onDone?.();
     } finally {
       setIsRecognizing(false);
     }
-  }, [clearCanvas, selectedCell, setCellValue, setLastRecognition]);
+  }, [clearCanvas, onDone, selectedCell, setCellValue, setLastRecognition]);
 
   const scheduleRecognize = useCallback(() => {
     if (recognizeTimerRef.current) {
@@ -235,11 +246,16 @@ export function DrawPad() {
     setHint("Case effacée");
   };
 
+  const canvasHeight = variant === "sheet" ? "h-56" : "h-48";
+  const showCanvas = variant === "sheet" || selectedCell;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">Mode dessin</p>
+          {variant === "inline" && (
+            <p className="text-sm font-medium">Mode dessin</p>
+          )}
           <p className="truncate text-xs text-muted-foreground">{hint}</p>
         </div>
         <div className="flex shrink-0 gap-2">
@@ -265,7 +281,7 @@ export function DrawPad() {
       </div>
 
       <AnimatePresence mode="wait">
-        {!selectedCell ? (
+        {!showCanvas ? (
           <motion.div
             key="empty"
             initial={{ opacity: 0, y: 8 }}
@@ -289,7 +305,7 @@ export function DrawPad() {
           >
             <canvas
               ref={canvasRef}
-              className="h-48 w-full touch-none"
+              className={cn("w-full touch-none", canvasHeight)}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}

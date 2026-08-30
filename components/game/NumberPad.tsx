@@ -8,7 +8,7 @@ import { useGameStore } from "@/store/useGameStore";
 
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
-export function NumberPad() {
+export function NumberPad({ onDone }: { onDone?: () => void }) {
   const selectedCell = useGameStore((s) => s.selectedCell);
   const setCellValue = useGameStore((s) => s.setCellValue);
   const clearCell = useGameStore((s) => s.clearCell);
@@ -27,6 +27,7 @@ export function NumberPad() {
 
     const isValid = setCellValue(selectedCell.row, selectedCell.col, digit);
     setLastRecognition(digit, isValid ? 100 : 100);
+    if (!notesMode && isValid) onDone?.();
   };
 
   const handleClear = () => {
@@ -40,9 +41,7 @@ export function NumberPad() {
       <div>
         <p className="text-sm font-medium">Mode clavier</p>
         <p className="text-xs text-muted-foreground">
-          {selectedCell
-            ? "Tape un chiffre pour remplir la case sélectionnée"
-            : "Sélectionne d'abord une case vide"}
+          Tape le chiffre à mettre dans la case
         </p>
       </div>
 

@@ -1,11 +1,35 @@
 "use client";
 
+import { useState } from "react";
+
 import { MobileShell } from "@/components/layout/MobileShell";
 import { Mascot } from "@/components/gamification/Mascot";
+import { buttonVariants } from "@/components/ui/button";
 import { useSharedUser } from "@/hooks/useSharedUser";
+import { useOnboardingStore } from "@/store/useOnboardingStore";
+import { useGameStore } from "@/store/useGameStore";
+import { cn } from "@/lib/utils";
 
 export default function ProfilPage() {
-  const { profile, loading, error } = useSharedUser();
+  const { profile, loading, error, refresh } = useSharedUser();
+  const [resetting, setResetting] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  const handleReset = async () => {
+    setResetting(true);
+    try {
+      const res = await fetch("/api/me/reset", { method: "POST" });
+      if (!res.ok) throw new Error("fail");
+      useOnboardingStore.getState().reset();
+      useGameStore.getState().resetGame();
+      await refresh();
+      setConfirmReset(false);
+    } catch {
+      alert("Impossible de tout remettre à zéro. Vérifie la base de données.");
+    } finally {
+      setResetting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -52,6 +76,41 @@ export default function ProfilPage() {
               : "Finis ta première grille pour gagner des points."
           }
         />
+
+        <div className="surface-card space-y-3 p-4">
+          <p className="text-sm font-semibold">Recommencer</p>
+          <p className="text-xs text-muted-foreground">
+            Remet à zéro les points, les grilles finies, les séries et le parcours.
+          </p>
+          {!confirmReset ? (
+            <button
+              type="button"
+              onClick={() => setConfirmReset(true)}
+              className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+            >
+              Tout remettre à zéro
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setConfirmReset(false)}
+                disabled={resetting}
+                className={cn(buttonVariants({ variant: "outline" }), "flex-1")}
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleReset()}
+                disabled={resetting}
+                className={cn(buttonVariants({ variant: "destructive" }), "flex-1")}
+              >
+                {resetting ? "…" : "Confirmer"}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </MobileShell>
   );

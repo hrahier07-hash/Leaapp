@@ -40,6 +40,7 @@ type GameState = {
   useHint: () => boolean;
   setLastRecognition: (digit: number | null, confidence: number) => void;
   resetGame: () => void;
+  clearSelection: () => void;
   isGiven: (row: number, col: number) => boolean;
 };
 
@@ -182,6 +183,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   resetGame: () => set(createInitialState()),
+
+  clearSelection: () => set({ selectedCell: null }),
 
   isGiven: (row, col) => get().initialGrid[row][col] !== EMPTY,
 }));

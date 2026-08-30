@@ -10,8 +10,14 @@ import { cn } from "@/lib/utils";
 
 type InputMode = "draw" | "keyboard";
 
-export function InputPanel() {
+type InputPanelProps = {
+  variant?: "inline" | "sheet";
+  onDone?: () => void;
+};
+
+export function InputPanel({ variant = "inline", onDone }: InputPanelProps) {
   const [mode, setMode] = useState<InputMode>("draw");
+  const isSheet = variant === "sheet";
 
   return (
     <div className="space-y-3">
@@ -50,7 +56,11 @@ export function InputPanel() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.15 }}
       >
-        {mode === "draw" ? <DrawPad /> : <NumberPad />}
+        {mode === "draw" ? (
+          <DrawPad variant={isSheet ? "sheet" : "inline"} onDone={onDone} />
+        ) : (
+          <NumberPad onDone={onDone} />
+        )}
       </motion.div>
     </div>
   );
