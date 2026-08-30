@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { PartyPopper } from "lucide-react";
 
-import { DrawPad } from "@/components/game/DrawPad";
+import { InputPanel } from "@/components/game/InputPanel";
 import { SudokuBoard } from "@/components/game/SudokuBoard";
 import { MobileShell } from "@/components/layout/MobileShell";
 import { useGameStore } from "@/store/useGameStore";
@@ -31,7 +31,7 @@ export function GameScreen() {
 
         <SudokuBoard />
 
-        <DrawPad />
+        <InputPanel />
 
         <AnimatePresence>
           {isComplete && (
