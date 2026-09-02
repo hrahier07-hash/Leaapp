@@ -56,12 +56,20 @@ export default function ProfilPage() {
   if (error || !profile) {
     return (
       <MobileShell title="Profil">
-        <div className="space-y-3 py-8 px-2 text-center text-sm text-muted-foreground">
-          <p>Les stats ne sont pas disponibles.</p>
+        <div className="space-y-4 py-8 px-2 text-center text-sm text-muted-foreground">
+          <p>Les stats ne sont pas disponibles pour le moment.</p>
           <p className="text-xs leading-relaxed">
-            En ligne (Vercel), il faut une URL de base spéciale (pooler Supabase),
-            pas la connexion directe. Change DATABASE_URL sur Vercel puis redéploie.
+            La connexion à la base Supabase a échoué. Sur Vercel, vérifie que{" "}
+            <code className="rounded bg-muted px-1">DATABASE_URL</code> utilise le{" "}
+            <strong>pooler</strong> (port 6543), pas la connexion directe.
           </p>
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            className={cn(buttonVariants({ variant: "outline" }), "mx-auto w-full max-w-xs")}
+          >
+            Réessayer
+          </button>
         </div>
       </MobileShell>
     );

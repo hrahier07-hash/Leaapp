@@ -60,6 +60,7 @@ model User {
   pushSubscription  Json?
   storyLevelUnlocked Int       @default(1)
   storyBeatsUnlocked Int[]      @default([])
+  lastResourcesResetKey String?
 
   accounts          Account[]
   sessions          Session[]

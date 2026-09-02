@@ -1,9 +1,11 @@
 "use client";
 
 import { Pause, Play, Undo2, PencilLine } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { HintIcon } from "@/components/gamification/ResourceIcons";
+import { HeartIcon, HintIcon } from "@/components/gamification/ResourceIcons";
+import { MISTAKES_PER_LIFE } from "@/lib/user/daily-resources";
+import { useSharedUser } from "@/hooks/useSharedUser";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/useGameStore";
 
@@ -24,23 +26,53 @@ export function GameHUD() {
   const togglePause = useGameStore((s) => s.togglePause);
   const toggleNotesMode = useGameStore((s) => s.toggleNotesMode);
   const undo = useGameStore((s) => s.undo);
-  const applyHint = useGameStore((s) => s.useHint);
+  const { profile, refresh } = useSharedUser();
+  const [hintLoading, setHintLoading] = useState(false);
 
   useEffect(() => {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [tick]);
 
-  const hintsLeft = Math.max(0, hintsBudget - hintsUsed);
-  const canHint = hintsLeft > 0;
+  useEffect(() => {
+    if (profile) {
+      useGameStore.setState({ hintsBudget: profile.hints });
+    }
+  }, [profile?.hints]);
+
+  const hearts = profile?.hearts ?? 0;
+  const canHint = hintsBudget > 0 && !hintLoading;
+
+  const handleHint = async () => {
+    if (!canHint) return;
+    setHintLoading(true);
+    try {
+      const res = await fetch("/api/me/use-hint", { method: "POST" });
+      if (!res.ok) return;
+
+      const data = (await res.json()) as { hints: number; hearts: number };
+      const placed = useGameStore.getState().useHint();
+      if (!placed) return;
+
+      useGameStore.setState({ hintsBudget: data.hints });
+      await refresh();
+    } finally {
+      setHintLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between surface-card px-4 py-3">
-        <div className="text-sm">
+        <div className="flex items-center gap-3 text-sm">
           <span className="font-bold">{formatTime(elapsedSeconds)}</span>
-          <span className="mx-2 text-muted-foreground">·</span>
-          <span>Erreurs {mistakes}</span>
+          <span className="text-muted-foreground">
+            Erreurs {mistakes}/{MISTAKES_PER_LIFE}
+          </span>
+          <span className="flex items-center gap-1 text-red-600">
+            <HeartIcon className="size-3.5" />
+            <strong>{hearts}</strong>
+          </span>
         </div>
         <div className="flex gap-1">
           <button type="button" onClick={togglePause} className="flex size-10 items-center justify-center rounded-full bg-muted active:scale-95" aria-label={isPaused ? "Reprendre" : "Pause"}>
@@ -51,11 +83,7 @@ export function GameHUD() {
           </button>
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              applyHint();
-            }}
+            onClick={() => void handleHint()}
             disabled={!canHint}
             className={cn(
               "flex size-10 items-center justify-center rounded-full active:scale-95 disabled:opacity-40",
@@ -80,8 +108,10 @@ export function GameHUD() {
       </div>
       <p className="text-center text-xs text-muted-foreground">
         <HintIcon className="mr-1 inline size-3.5 align-[-2px]" />
-        Indices : {hintsUsed} utilisé{hintsUsed > 1 ? "s" : ""} · {hintsLeft} restant
-        {hintsLeft > 1 ? "s" : ""}
+        Indices : {hintsUsed} utilisé{hintsUsed > 1 ? "s" : ""} · {hintsBudget} restant
+        {hintsBudget > 1 ? "s" : ""}
+        <span className="mx-2">·</span>
+        3 erreurs = −1 vie, grille remise à zéro
       </p>
     </div>
   );

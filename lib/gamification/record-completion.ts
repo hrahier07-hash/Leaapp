@@ -1,8 +1,4 @@
-import {
-  computeHeartsAfterLoss,
-  computeXpForCompletion,
-  updateStreak,
-} from "@/lib/gamification/xp";
+import { computeXpForCompletion, updateStreak } from "@/lib/gamification/xp";
 import type { CompletionPayload, CompletionResult } from "@/lib/gamification/completion-types";
 import { STORY_LEVEL_COUNT } from "@/lib/story/levels";
 import { prisma } from "@/lib/db/client";
@@ -59,21 +55,6 @@ export async function recordPuzzleCompletion(
     now,
   );
 
-  const regen = computeHeartsAfterLoss(
-    user.hearts,
-    now,
-    user.lastHeartLostAt,
-  );
-
-  const hearts = Math.max(0, regen.hearts - payload.mistakesCount);
-  let lastHeartLostAt = regen.lastHeartLostAt;
-
-  if (payload.mistakesCount > 0 && hearts < regen.hearts) {
-    lastHeartLostAt = now;
-  }
-
-  const hints = Math.max(0, user.hints - payload.hintsUsed);
-
   let storyLevelUnlocked = user.storyLevelUnlocked;
   const storyBeatsUnlocked = [...user.storyBeatsUnlocked];
 
@@ -124,9 +105,6 @@ export async function recordPuzzleCompletion(
       currentStreak: streak.currentStreak,
       longestStreak: streak.longestStreak,
       lastActivityDate: streak.lastActivityDate,
-      hearts,
-      hints,
-      lastHeartLostAt,
       storyLevelUnlocked,
       storyBeatsUnlocked,
     },

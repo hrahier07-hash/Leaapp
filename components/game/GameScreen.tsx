@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { CellInputSheet } from "@/components/game/CellInputSheet";
 import { GameHUD } from "@/components/game/GameHUD";
 import { GameResults } from "@/components/game/GameResults";
+import { LifeLossHandler, NoLivesGate } from "@/components/game/LifeLossHandler";
 import { SudokuBoard } from "@/components/game/SudokuBoard";
 import { MobileShell } from "@/components/layout/MobileShell";
 import { generateDailyChallenge } from "@/lib/daily/challenge";
@@ -53,6 +54,7 @@ function GameScreenContent() {
         )}
         <GameHUD />
         <SudokuBoard />
+        <LifeLossHandler />
         <GameResults />
       </div>
       {!isPaused && <CellInputSheet />}
@@ -147,7 +149,11 @@ function GameLoader() {
     );
   }
 
-  return <GameScreenContent />;
+  return (
+    <NoLivesGate>
+      <GameScreenContent />
+    </NoLivesGate>
+  );
 }
 
 export function GameScreen() {

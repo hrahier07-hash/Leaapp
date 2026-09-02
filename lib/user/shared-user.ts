@@ -1,4 +1,11 @@
 import { prisma } from "@/lib/db/client";
+import {
+  DAILY_HEARTS,
+  DAILY_HINTS,
+  ensureDailyResourcesReset,
+  sharedUserInclude,
+  todayResourcesResetKey,
+} from "@/lib/user/daily-resources";
 
 export const SHARED_USER_EMAIL =
   process.env.SHARED_USER_EMAIL ?? "joueur@sudoku-quest.app";
@@ -6,39 +13,30 @@ export const SHARED_USER_EMAIL =
 export async function getOrCreateSharedUser() {
   const existing = await prisma.user.findUnique({
     where: { email: SHARED_USER_EMAIL },
-    include: {
-      _count: {
-        select: {
-          attempts: true,
-          badges: true,
-        },
-      },
-    },
+    include: sharedUserInclude,
   });
 
-  if (existing) return existing;
+  if (existing) {
+    return ensureDailyResourcesReset(existing);
+  }
 
+  const todayKey = todayResourcesResetKey();
   return prisma.user.create({
     data: {
       email: SHARED_USER_EMAIL,
       name: "Joueur LeaDoku",
-      hearts: 5,
-      hints: 5,
+      hearts: DAILY_HEARTS,
+      hints: DAILY_HINTS,
       gems: 0,
       totalXp: 0,
       currentStreak: 0,
       longestStreak: 0,
       onboardingDone: true,
       storyLevelUnlocked: 1,
+      storyBeatsUnlocked: [],
+      lastResourcesResetKey: todayKey,
     },
-    include: {
-      _count: {
-        select: {
-          attempts: true,
-          badges: true,
-        },
-      },
-    },
+    include: sharedUserInclude,
   });
 }
 

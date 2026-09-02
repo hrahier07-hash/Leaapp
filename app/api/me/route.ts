@@ -7,9 +7,11 @@ export async function GET() {
   try {
     const profile = await getSharedUserProfile();
     return NextResponse.json(profile);
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown";
+    console.error("[GET /api/me]", message);
     return NextResponse.json(
-      { error: "base_indisponible" },
+      { error: "base_indisponible", detail: message },
       { status: 503 },
     );
   }

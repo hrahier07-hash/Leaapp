@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/client";
 import { SHARED_USER_EMAIL } from "@/lib/user/shared-user";
+import { todayResourcesResetKey } from "@/lib/user/daily-resources";
 
 export async function resetSharedUser() {
   const user = await prisma.user.findUnique({
@@ -20,6 +21,7 @@ export async function resetSharedUser() {
         onboardingDone: false,
         storyLevelUnlocked: 1,
         storyBeatsUnlocked: [],
+        lastResourcesResetKey: todayResourcesResetKey(),
       },
     });
   }
@@ -47,6 +49,7 @@ export async function resetSharedUser() {
         streakFreezes: 0,
         storyLevelUnlocked: 1,
         storyBeatsUnlocked: [],
+        lastResourcesResetKey: todayResourcesResetKey(),
         name: "Joueur LeaDoku",
         image: null,
       },

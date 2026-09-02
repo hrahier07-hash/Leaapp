@@ -47,6 +47,7 @@ type GameState = {
   clearCell: (row: number, col: number) => void;
   undo: () => void;
   useHint: () => boolean;
+  restartPuzzle: () => void;
   setLastRecognition: (digit: number | null, confidence: number) => void;
   resetGame: () => void;
   loadPuzzle: (
@@ -219,7 +220,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   useHint: () => {
     const state = get();
-    if (state.hintsUsed >= state.hintsBudget) return false;
+    if (state.hintsBudget <= 0) return false;
 
     let row: number;
     let col: number;
@@ -263,6 +264,22 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     return true;
+  },
+
+  restartPuzzle: () => {
+    const state = get();
+    set({
+      grid: cloneGrid(state.initialGrid),
+      notes: emptyNotes(),
+      hintMask: emptyHintMask(),
+      mistakes: 0,
+      history: [],
+      isComplete: false,
+      isPaused: false,
+      selectedCell: null,
+      startedAt: Date.now(),
+      elapsedSeconds: 0,
+    });
   },
 
   setLastRecognition: (digit, confidence) => {
