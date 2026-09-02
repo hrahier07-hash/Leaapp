@@ -54,10 +54,21 @@ export type SharedUserProfile = {
   puzzlesCompleted: number;
   badgesCount: number;
   storyLevelUnlocked: number;
+  totalMistakes: number;
+  totalHintsUsed: number;
 };
 
 export async function getSharedUserProfile(): Promise<SharedUserProfile> {
   const user = await getOrCreateSharedUser();
+
+  const attempts = await prisma.userPuzzleAttempt.findMany({
+    where: { userId: user.id, completedAt: { not: null } },
+    select: { mistakesCount: true, hintsUsed: true },
+  });
+
+  const totalMistakes = attempts.reduce((sum, a) => sum + a.mistakesCount, 0);
+  const totalHintsUsed = attempts.reduce((sum, a) => sum + a.hintsUsed, 0);
+
   return {
     id: user.id,
     name: user.name,
@@ -67,8 +78,10 @@ export async function getSharedUserProfile(): Promise<SharedUserProfile> {
     hearts: user.hearts,
     hints: user.hints,
     gems: user.gems,
-    puzzlesCompleted: user._count.attempts,
+    puzzlesCompleted: attempts.length,
     badgesCount: user._count.badges,
     storyLevelUnlocked: user.storyLevelUnlocked,
+    totalMistakes,
+    totalHintsUsed,
   };
 }

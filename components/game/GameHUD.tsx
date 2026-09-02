@@ -16,6 +16,7 @@ export function GameHUD() {
   const elapsedSeconds = useGameStore((s) => s.elapsedSeconds);
   const mistakes = useGameStore((s) => s.mistakes);
   const hintsUsed = useGameStore((s) => s.hintsUsed);
+  const hintsBudget = useGameStore((s) => s.hintsBudget);
   const isPaused = useGameStore((s) => s.isPaused);
   const notesMode = useGameStore((s) => s.notesMode);
   const tick = useGameStore((s) => s.tick);
@@ -44,7 +45,13 @@ export function GameHUD() {
           <button type="button" onClick={undo} className="flex size-10 items-center justify-center rounded-full bg-muted active:scale-95" aria-label="Annuler">
             <Undo2 className="size-4" />
           </button>
-          <button type="button" onClick={useHint} className="flex size-10 items-center justify-center rounded-full bg-muted active:scale-95" aria-label="Indice">
+          <button
+            type="button"
+            onClick={useHint}
+            disabled={hintsUsed >= hintsBudget}
+            className="flex size-10 items-center justify-center rounded-full bg-muted active:scale-95 disabled:opacity-40"
+            aria-label="Indice"
+          >
             <Lightbulb className="size-4" />
           </button>
           <button
@@ -61,7 +68,9 @@ export function GameHUD() {
         </div>
       </div>
       <p className="text-center text-xs text-muted-foreground">
-        Indices utilisés : {hintsUsed}
+        Indices : {hintsUsed} utilisé{hintsUsed > 1 ? "s" : ""} ·{" "}
+        {Math.max(0, hintsBudget - hintsUsed)} restant
+        {Math.max(0, hintsBudget - hintsUsed) > 1 ? "s" : ""}
       </p>
     </div>
   );

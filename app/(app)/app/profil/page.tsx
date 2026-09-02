@@ -78,11 +78,13 @@ export default function ProfilPage() {
 
         <div className="grid grid-cols-2 gap-3 text-sm">
           <Stat label="Points total" value={profile.totalXp} />
-          <Stat label="Jours d'affilée" value={profile.currentStreak} />
-          <Stat label="Meilleure série" value={profile.longestStreak} />
           <Stat label="Grilles finies" value={profile.puzzlesCompleted} />
-          <Stat label="Histoire" value={storyDone} suffix={`/${STORY_LEVEL_COUNT}`} />
+          <Stat label="Erreurs total" value={profile.totalMistakes} />
+          <Stat label="Indices utilisés" value={profile.totalHintsUsed} />
+          <Stat label="Vies restantes" value={profile.hearts} />
           <Stat label="Indices restants" value={profile.hints} />
+          <Stat label="Jours d'affilée" value={profile.currentStreak} />
+          <Stat label="Histoire" value={storyDone} suffix={`/${STORY_LEVEL_COUNT}`} />
         </div>
 
         <Mascot

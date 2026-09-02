@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { CellInputSheet } from "@/components/game/CellInputSheet";
@@ -12,6 +12,7 @@ import { generateDailyChallenge } from "@/lib/daily/challenge";
 import { getParisDateKey } from "@/lib/daily/time";
 import { getLesson } from "@/lib/lessons/content";
 import { getStoryLevelLabel, getStoryPuzzle } from "@/lib/story/levels";
+import { useSharedUser } from "@/hooks/useSharedUser";
 import { useGameStore } from "@/store/useGameStore";
 
 function GameScreenContent() {
@@ -63,13 +64,17 @@ function GameLoader() {
   const searchParams = useSearchParams();
   const loadPuzzle = useGameStore((s) => s.loadPuzzle);
   const resetGame = useGameStore((s) => s.resetGame);
+  const { profile } = useSharedUser();
   const [ready, setReady] = useState(false);
   const [loadingDaily, setLoadingDaily] = useState(false);
+  const hintsLoadedRef = useRef(false);
 
   const technique = searchParams.get("technique");
   const histoireParam = searchParams.get("histoire");
   const isDaily = searchParams.get("defi") === "1";
   const storyLevel = histoireParam ? Number(histoireParam) : null;
+
+  const hintsBudget = profile?.hints ?? 5;
 
   useEffect(() => {
     if (isDaily) {
@@ -83,6 +88,7 @@ function GameLoader() {
             gameMode: "daily",
             dailyDateKey: dateKey,
             dailyPatternName: challenge.patternName,
+            hintsBudget,
           });
           setReady(true);
         } catch {
@@ -98,17 +104,36 @@ function GameLoader() {
     if (storyLevel && storyLevel >= 1 && storyLevel <= 50) {
       setReady(false);
       const { puzzle, solution } = getStoryPuzzle(storyLevel);
-      loadPuzzle(puzzle, solution, { gameMode: "story", storyLevel });
+      loadPuzzle(puzzle, solution, {
+        gameMode: "story",
+        storyLevel,
+        hintsBudget,
+      });
       setReady(true);
       return;
     }
 
     resetGame();
     if (technique) {
-      useGameStore.setState({ gameMode: "lesson" });
+      useGameStore.setState({ gameMode: "lesson", hintsBudget });
+    } else {
+      useGameStore.setState({ hintsBudget });
     }
     setReady(true);
-  }, [isDaily, storyLevel, technique, loadPuzzle, resetGame]);
+  }, [
+    isDaily,
+    storyLevel,
+    technique,
+    loadPuzzle,
+    resetGame,
+    hintsBudget,
+  ]);
+
+  useEffect(() => {
+    if (!profile || hintsLoadedRef.current || isDaily || storyLevel) return;
+    hintsLoadedRef.current = true;
+    useGameStore.setState({ hintsBudget: profile.hints });
+  }, [profile, isDaily, storyLevel]);
 
   if (!ready) {
     return (

@@ -30,6 +30,11 @@ export function validateMove(
   return true;
 }
 
-export function isGridComplete(grid: Grid): boolean {
-  return grid.every((row) => row.every((cell) => cell !== EMPTY));
+export function isGridComplete(grid: Grid, solution?: Grid): boolean {
+  const filled = grid.every((row) => row.every((cell) => cell !== EMPTY));
+  if (!filled) return false;
+  if (!solution) return true;
+  return grid.every((row, r) =>
+    row.every((cell, c) => cell === solution[r][c]),
+  );
 }
