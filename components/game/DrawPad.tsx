@@ -302,11 +302,11 @@ export function DrawPad({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             className={cn(
-              "overflow-hidden rounded-2xl border-2 shadow-inner",
+              "overflow-hidden rounded-2xl border-2 border-black/50 shadow-inner",
               variant === "sheet"
-                ? "border-white/30 bg-background/20 backdrop-blur-[2px]"
-                : "border-border bg-white/50",
-              isDrawing ? "border-primary" : variant === "sheet" ? "border-white/30" : "border-border",
+                ? "bg-background/20 backdrop-blur-[2px]"
+                : "bg-white/50",
+              isDrawing && "border-black/70",
               isRecognizing && "opacity-70",
             )}
           >

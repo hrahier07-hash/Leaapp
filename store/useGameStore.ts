@@ -118,7 +118,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   selectCell: (row, col) => {
     const state = get();
     if (state.initialGrid[row][col] !== EMPTY) return;
-    if (state.grid[row][col] !== EMPTY) return;
     set({ selectedCell: { row, col } });
   },
 
