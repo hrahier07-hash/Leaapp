@@ -75,17 +75,30 @@ export async function recordPuzzleCompletion(
   const hints = Math.max(0, user.hints - payload.hintsUsed);
 
   let storyLevelUnlocked = user.storyLevelUnlocked;
+  const storyBeatsUnlocked = [...user.storyBeatsUnlocked];
 
   if (
     payload.gameMode === "story" &&
     payload.storyLevel &&
     payload.storyLevel >= 1 &&
     payload.storyLevel <= STORY_LEVEL_COUNT &&
-    payload.storyLevel <= user.storyLevelUnlocked &&
-    payload.storyLevel === user.storyLevelUnlocked &&
-    payload.storyLevel < STORY_LEVEL_COUNT
+    payload.storyLevel <= user.storyLevelUnlocked
   ) {
-    storyLevelUnlocked = payload.storyLevel + 1;
+    if (!storyBeatsUnlocked.includes(payload.storyLevel)) {
+      storyBeatsUnlocked.push(payload.storyLevel);
+    }
+
+    if (
+      payload.storyLevel === user.storyLevelUnlocked &&
+      payload.storyLevel < STORY_LEVEL_COUNT
+    ) {
+      storyLevelUnlocked = payload.storyLevel + 1;
+    } else if (
+      payload.storyLevel === STORY_LEVEL_COUNT &&
+      payload.storyLevel === user.storyLevelUnlocked
+    ) {
+      storyLevelUnlocked = STORY_LEVEL_COUNT + 1;
+    }
   }
 
   const template = await findPuzzleTemplate(payload);
@@ -115,6 +128,7 @@ export async function recordPuzzleCompletion(
       hints,
       lastHeartLostAt,
       storyLevelUnlocked,
+      storyBeatsUnlocked,
     },
   });
 
@@ -137,5 +151,6 @@ export async function recordPuzzleCompletion(
     totalMistakes,
     totalHintsUsed,
     storyLevelUnlocked: updated.storyLevelUnlocked,
+    storyBeatsUnlocked: updated.storyBeatsUnlocked,
   };
 }

@@ -55,6 +55,7 @@ export type SharedUserProfile = {
   puzzlesCompleted: number;
   badgesCount: number;
   storyLevelUnlocked: number;
+  storyBeatsUnlocked: number[];
   totalMistakes: number;
   totalHintsUsed: number;
 };
@@ -83,6 +84,7 @@ export async function getSharedUserProfile(): Promise<SharedUserProfile> {
     puzzlesCompleted: attempts.length,
     badgesCount: user._count.badges,
     storyLevelUnlocked: user.storyLevelUnlocked,
+    storyBeatsUnlocked: user.storyBeatsUnlocked,
     totalMistakes,
     totalHintsUsed,
   };

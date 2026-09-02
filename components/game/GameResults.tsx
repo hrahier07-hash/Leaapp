@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
+import { getStoryBeat } from "@/content/story/grimoire-dechire";
 import { Mascot } from "@/components/gamification/Mascot";
+import { StoryOverlay } from "@/components/story/StoryOverlay";
 import { buttonVariants } from "@/components/ui/button";
 import { computeXpForCompletion } from "@/lib/gamification/xp";
 import { getDifficultyForLevel, STORY_LEVEL_COUNT } from "@/lib/story/levels";
@@ -34,8 +36,12 @@ export function GameResults() {
   const dailyDateKey = useGameStore((s) => s.dailyDateKey);
   const { refresh } = useSharedUser();
   const savedRef = useRef(false);
+  const [storySceneDismissed, setStorySceneDismissed] = useState(false);
 
   const difficulty = getDifficultyForGame(gameMode, storyLevel);
+  const storyBeat =
+    gameMode === "story" && storyLevel ? getStoryBeat(storyLevel) : null;
+  const showStoryScene = Boolean(storyBeat) && !storySceneDismissed;
 
   const xp = computeXpForCompletion({
     difficulty,
@@ -80,74 +86,99 @@ export function GameResults() {
     storyLevel && storyLevel < STORY_LEVEL_COUNT ? storyLevel + 1 : null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="surface-card space-y-4 p-4"
-    >
-      <Mascot mood="proud" message="Grille complète ! Tous les chiffres sont bons." />
-      <div className="grid grid-cols-2 gap-2 text-center text-sm">
-        <div className="rounded-xl bg-muted p-3">
-          <p className="text-xs text-muted-foreground">Temps</p>
-          <p className="font-bold">{elapsedSeconds}s</p>
-        </div>
-        <div className="rounded-xl bg-muted p-3">
-          <p className="text-xs text-muted-foreground">Points gagnés</p>
-          <p className="font-bold">+{xp}</p>
-        </div>
-        <div className="rounded-xl bg-muted p-3">
-          <p className="text-xs text-muted-foreground">Erreurs</p>
-          <p className="font-bold">{mistakes}</p>
-        </div>
-        <div className="rounded-xl bg-muted p-3">
-          <p className="text-xs text-muted-foreground">Indices utilisés</p>
-          <p className="font-bold">{hintsUsed}</p>
-        </div>
-      </div>
-
-      {gameMode === "daily" ? (
-        <>
-          <p className="text-center text-sm text-muted-foreground">
-            Défi du {dailyDateKey ?? "jour"} terminé !
-          </p>
-          <Link
-            href="/app/defi-du-jour"
-            className={cn(buttonVariants(), "w-full")}
-          >
-            Retour au défi
-          </Link>
-        </>
-      ) : gameMode === "story" && storyLevel ? (
-        <>
-          {nextStoryLevel ? (
-            <Link
-              href={`/app/jouer?histoire=${nextStoryLevel}`}
-              className={cn(buttonVariants(), "w-full")}
-            >
-              Niveau {nextStoryLevel}
-            </Link>
-          ) : (
-            <p className="text-center text-sm font-medium text-primary">
-              Tu as fini toute l&apos;histoire !
-            </p>
-          )}
-          <Link
-            href="/app/histoire"
-            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
-          >
-            Retour à l&apos;histoire
-          </Link>
-        </>
-      ) : (
-        <>
-          <Link href="/app/jouer" className={cn(buttonVariants(), "w-full")}>
-            Nouvelle grille
-          </Link>
-          <Link href="/app" className={cn(buttonVariants({ variant: "outline" }), "w-full")}>
-            Retour aux leçons
-          </Link>
-        </>
+    <>
+      {storyBeat && (
+        <StoryOverlay
+          beat={storyBeat}
+          open={showStoryScene}
+          onContinue={() => setStorySceneDismissed(true)}
+        />
       )}
-    </motion.div>
+
+      {!showStoryScene && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="surface-card space-y-4 p-4"
+        >
+          <Mascot
+            mood="proud"
+            message={
+              gameMode === "story" && storyBeat
+                ? `Page ${storyBeat.level} déchiffrée !`
+                : "Grille complète ! Tous les chiffres sont bons."
+            }
+          />
+          <div className="grid grid-cols-2 gap-2 text-center text-sm">
+            <div className="rounded-xl bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Temps</p>
+              <p className="font-bold">{elapsedSeconds}s</p>
+            </div>
+            <div className="rounded-xl bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Points gagnés</p>
+              <p className="font-bold">+{xp}</p>
+            </div>
+            <div className="rounded-xl bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Erreurs</p>
+              <p className="font-bold">{mistakes}</p>
+            </div>
+            <div className="rounded-xl bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Indices utilisés</p>
+              <p className="font-bold">{hintsUsed}</p>
+            </div>
+          </div>
+
+          {gameMode === "daily" ? (
+            <>
+              <p className="text-center text-sm text-muted-foreground">
+                Défi du {dailyDateKey ?? "jour"} terminé !
+              </p>
+              <Link
+                href="/app/defi-du-jour"
+                className={cn(buttonVariants(), "w-full")}
+              >
+                Retour au défi
+              </Link>
+            </>
+          ) : gameMode === "story" && storyLevel ? (
+            <>
+              {nextStoryLevel ? (
+                <Link
+                  href={`/app/jouer?histoire=${nextStoryLevel}`}
+                  className={cn(buttonVariants(), "w-full")}
+                >
+                  Page suivante · Niveau {nextStoryLevel}
+                </Link>
+              ) : (
+                <p className="text-center text-sm font-medium text-primary">
+                  Tu as fini Le Grimoire Déchiré !
+                </p>
+              )}
+              <Link
+                href="/app/histoire"
+                className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+              >
+                Retour au Monde Histoire
+              </Link>
+              <Link href="/app/jouer" className={cn(buttonVariants({ variant: "ghost" }), "w-full")}>
+                Grille libre
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/app/jouer" className={cn(buttonVariants(), "w-full")}>
+                Nouvelle grille
+              </Link>
+              <Link
+                href="/app"
+                className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+              >
+                Retour aux leçons
+              </Link>
+            </>
+          )}
+        </motion.div>
+      )}
+    </>
   );
 }

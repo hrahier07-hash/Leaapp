@@ -15,6 +15,7 @@ export type SharedUserProfile = {
   puzzlesCompleted: number;
   badgesCount: number;
   storyLevelUnlocked: number;
+  storyBeatsUnlocked: number[];
   totalMistakes: number;
   totalHintsUsed: number;
 };

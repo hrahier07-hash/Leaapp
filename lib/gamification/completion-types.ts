@@ -21,4 +21,5 @@ export type CompletionResult = {
   totalMistakes: number;
   totalHintsUsed: number;
   storyLevelUnlocked?: number;
+  storyBeatsUnlocked?: number[];
 };

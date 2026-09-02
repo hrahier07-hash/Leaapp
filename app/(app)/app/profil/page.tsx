@@ -6,6 +6,7 @@ import { RotateCcw } from "lucide-react";
 import { MobileShell } from "@/components/layout/MobileShell";
 import { Mascot } from "@/components/gamification/Mascot";
 import { ProfileEditor } from "@/components/profile/ProfileEditor";
+import { StoryGallery } from "@/components/story/StoryGallery";
 import { HeartIcon, HintIcon, StreakIcon } from "@/components/gamification/ResourceIcons";
 import { buttonVariants } from "@/components/ui/button";
 import { STORY_LEVEL_COUNT } from "@/lib/story/levels";
@@ -66,12 +67,17 @@ export default function ProfilPage() {
     );
   }
 
-  const storyDone = Math.max(0, profile.storyLevelUnlocked - 1);
+  const storyDone = Math.min(
+    STORY_LEVEL_COUNT,
+    Math.max(0, profile.storyLevelUnlocked - 1),
+  );
 
   return (
     <MobileShell title="Profil">
       <div className="space-y-4 py-2">
         <ProfileEditor profile={profile} onUpdated={refresh} />
+
+        <StoryGallery />
 
         <div className="grid grid-cols-2 gap-3 text-sm">
           <Stat label="Points total" value={profile.totalXp} />

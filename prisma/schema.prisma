@@ -59,6 +59,7 @@ model User {
   streakFreezes     Int       @default(0)
   pushSubscription  Json?
   storyLevelUnlocked Int       @default(1)
+  storyBeatsUnlocked Int[]      @default([])
 
   accounts          Account[]
   sessions          Session[]

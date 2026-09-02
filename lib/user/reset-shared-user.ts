@@ -19,6 +19,7 @@ export async function resetSharedUser() {
         longestStreak: 0,
         onboardingDone: false,
         storyLevelUnlocked: 1,
+        storyBeatsUnlocked: [],
       },
     });
   }
@@ -45,6 +46,7 @@ export async function resetSharedUser() {
         lastHeartLostAt: null,
         streakFreezes: 0,
         storyLevelUnlocked: 1,
+        storyBeatsUnlocked: [],
         name: "Joueur LeaDoku",
         image: null,
       },
