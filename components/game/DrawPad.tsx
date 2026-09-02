@@ -35,10 +35,13 @@ function drawStrokes(
   width: number,
   height: number,
   strokeSize: number,
+  transparentBg = false,
 ) {
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, width, height);
+  if (!transparentBg) {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+  }
 
   for (const stroke of strokes) {
     if (stroke.length === 0) continue;
@@ -96,6 +99,7 @@ export function DrawPad({
   }, []);
 
   const strokeSize = variant === "sheet" ? STROKE_SIZE_SHEET : STROKE_SIZE_INLINE;
+  const transparentBg = variant === "sheet";
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -111,8 +115,8 @@ export function DrawPad({
     canvas.height = height * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    drawStrokes(ctx, strokesRef.current, width, height, strokeSize);
-  }, [strokeSize]);
+    drawStrokes(ctx, strokesRef.current, width, height, strokeSize, transparentBg);
+  }, [strokeSize, transparentBg]);
 
   useEffect(() => {
     redraw();
@@ -171,9 +175,7 @@ export function DrawPad({
       );
 
       clearCanvas();
-      if (isValid) {
-        window.setTimeout(() => onDone?.(), 450);
-      }
+      onDone?.();
     } finally {
       setIsRecognizing(false);
     }
@@ -300,8 +302,11 @@ export function DrawPad({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             className={cn(
-              "overflow-hidden rounded-2xl border-2 bg-white/50 shadow-inner",
-              isDrawing ? "border-primary" : "border-border",
+              "overflow-hidden rounded-2xl border-2 shadow-inner",
+              variant === "sheet"
+                ? "border-white/30 bg-background/20 backdrop-blur-[2px]"
+                : "border-border bg-white/50",
+              isDrawing ? "border-primary" : variant === "sheet" ? "border-white/30" : "border-border",
               isRecognizing && "opacity-70",
             )}
           >

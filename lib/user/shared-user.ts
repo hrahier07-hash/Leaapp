@@ -45,6 +45,7 @@ export async function getOrCreateSharedUser() {
 export type SharedUserProfile = {
   id: string;
   name: string | null;
+  image: string | null;
   totalXp: number;
   currentStreak: number;
   longestStreak: number;
@@ -72,6 +73,7 @@ export async function getSharedUserProfile(): Promise<SharedUserProfile> {
   return {
     id: user.id,
     name: user.name,
+    image: user.image,
     totalXp: user.totalXp,
     currentStreak: user.currentStreak,
     longestStreak: user.longestStreak,

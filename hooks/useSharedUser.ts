@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 export type SharedUserProfile = {
   id: string;
   name: string | null;
+  image: string | null;
   totalXp: number;
   currentStreak: number;
   longestStreak: number;

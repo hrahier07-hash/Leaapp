@@ -5,6 +5,8 @@ import { RotateCcw } from "lucide-react";
 
 import { MobileShell } from "@/components/layout/MobileShell";
 import { Mascot } from "@/components/gamification/Mascot";
+import { ProfileEditor } from "@/components/profile/ProfileEditor";
+import { HeartIcon, HintIcon, StreakIcon } from "@/components/gamification/ResourceIcons";
 import { buttonVariants } from "@/components/ui/button";
 import { STORY_LEVEL_COUNT } from "@/lib/story/levels";
 import { useSharedUser } from "@/hooks/useSharedUser";
@@ -69,21 +71,21 @@ export default function ProfilPage() {
   return (
     <MobileShell title="Profil">
       <div className="space-y-4 py-2">
-        <div className="surface-card p-4">
-          <p className="text-lg font-bold">{profile.name ?? "Joueur LeaDoku"}</p>
-          <p className="text-sm text-muted-foreground">
-            Compte partagé. Ta progression est sauvegardée ici.
-          </p>
-        </div>
+        <ProfileEditor profile={profile} onUpdated={refresh} />
 
         <div className="grid grid-cols-2 gap-3 text-sm">
           <Stat label="Points total" value={profile.totalXp} />
           <Stat label="Grilles finies" value={profile.puzzlesCompleted} />
           <Stat label="Erreurs total" value={profile.totalMistakes} />
           <Stat label="Indices utilisés" value={profile.totalHintsUsed} />
-          <Stat label="Vies restantes" value={profile.hearts} />
-          <Stat label="Indices restants" value={profile.hints} />
-          <Stat label="Jours d'affilée" value={profile.currentStreak} />
+          <Stat label="Vies restantes" value={profile.hearts} icon="heart" />
+          <Stat label="Indices restants" value={profile.hints} icon="hint" />
+          <Stat
+            label="Jours d'affilée"
+            value={profile.currentStreak}
+            icon="streak"
+            streakActive={profile.currentStreak > 0}
+          />
           <Stat label="Histoire" value={storyDone} suffix={`/${STORY_LEVEL_COUNT}`} />
         </div>
 
@@ -152,15 +154,33 @@ function Stat({
   label,
   value,
   suffix = "",
+  icon,
+  streakActive,
 }: {
   label: string;
   value: number;
   suffix?: string;
+  icon?: "heart" | "hint" | "streak";
+  streakActive?: boolean;
 }) {
+  const valueClass =
+    icon === "heart"
+      ? "text-red-600"
+      : icon === "hint"
+        ? "text-amber-600"
+        : icon === "streak" && streakActive
+          ? "text-orange-600"
+          : undefined;
+
   return (
     <div className="surface-card p-3">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-xl font-bold">
+      <p className="flex items-center gap-1 text-xs text-muted-foreground">
+        {icon === "heart" && <HeartIcon className="size-3.5" />}
+        {icon === "hint" && <HintIcon className="size-3.5" />}
+        {icon === "streak" && <StreakIcon active={streakActive} className="size-3.5" />}
+        {label}
+      </p>
+      <p className={cn("text-xl font-bold", valueClass)}>
         {value}
         {suffix}
       </p>

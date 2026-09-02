@@ -45,6 +45,8 @@ export async function resetSharedUser() {
         lastHeartLostAt: null,
         streakFreezes: 0,
         storyLevelUnlocked: 1,
+        name: "Joueur LeaDoku",
+        image: null,
       },
     }),
   ]);

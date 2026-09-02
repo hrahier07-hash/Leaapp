@@ -1,8 +1,7 @@
 "use client";
 
-import { Flame, Heart, Lightbulb } from "lucide-react";
-
 import { useSharedUser } from "@/hooks/useSharedUser";
+import { HeartIcon, HintIcon, StreakIcon } from "@/components/gamification/ResourceIcons";
 import { cn } from "@/lib/utils";
 
 type TopBarProps = {
@@ -26,16 +25,18 @@ export function TopBar({ className }: TopBarProps) {
     >
       <div className="flex items-center gap-4 text-sm">
         <span className="flex items-center gap-1" title="Vies">
-          <Heart className="size-4 text-muted-foreground" />
-          <strong>{loading ? "…" : hearts}</strong>
+          <HeartIcon />
+          <strong className="text-red-600">{loading ? "…" : hearts}</strong>
         </span>
         <span className="flex items-center gap-1" title="Indices">
-          <Lightbulb className="size-4 text-muted-foreground" />
-          <strong>{loading ? "…" : hints}</strong>
+          <HintIcon />
+          <strong className="text-amber-600">{loading ? "…" : hints}</strong>
         </span>
         <span className="flex items-center gap-1" title="Jours d'affilée">
-          <Flame className="size-4 text-muted-foreground" />
-          <strong>{loading ? "…" : streak}</strong>
+          <StreakIcon active={streak > 0} />
+          <strong className={streak > 0 ? "text-orange-600" : undefined}>
+            {loading ? "…" : streak}
+          </strong>
         </span>
       </div>
       <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold">

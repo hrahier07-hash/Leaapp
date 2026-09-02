@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Info } from "lucide-react";
 
+import { DailyChallengeInfoSheet } from "@/components/app/DailyChallengeInfoSheet";
 import { MobileShell } from "@/components/layout/MobileShell";
 import {
   getDailyChallengePreview,
@@ -74,6 +76,7 @@ function PatternPreview({ patternId }: { patternId: string }) {
 export function DailyChallengeScreen() {
   const [preview, setPreview] = useState<DailyPreview | null>(null);
   const [countdown, setCountdown] = useState("");
+  const [infoOpen, setInfoOpen] = useState(false);
   const dateKey = getParisDateKey();
 
   useEffect(() => {
@@ -100,7 +103,20 @@ export function DailyChallengeScreen() {
     : "Expert";
 
   return (
-    <MobileShell title="Défi du jour">
+    <MobileShell
+      title="Défi du jour"
+      headerAction={
+        <button
+          type="button"
+          onClick={() => setInfoOpen(true)}
+          className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-muted/60 text-muted-foreground active:scale-95"
+          aria-label="Consignes du défi du jour"
+        >
+          <Info className="size-4" strokeWidth={2.25} />
+        </button>
+      }
+    >
+      <DailyChallengeInfoSheet open={infoOpen} onClose={() => setInfoOpen(false)} />
       <div className="space-y-4 py-2">
         <div className="surface-card space-y-3 p-4">
           <p className="text-sm text-muted-foreground">

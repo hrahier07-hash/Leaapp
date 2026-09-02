@@ -31,7 +31,7 @@ export function CellInputSheet() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.94 }}
             transition={{ type: "spring", damping: 26, stiffness: 340 }}
-            className="relative z-10 w-full max-w-[min(100%,22rem)] rounded-2xl border border-white/30 bg-background/20 px-4 py-3 shadow-lg backdrop-blur-[2px]"
+            className="relative z-10 w-full max-w-[min(100%,22rem)] rounded-2xl border-2 border-primary bg-background/20 px-4 py-3 shadow-lg backdrop-blur-[2px]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-2 flex items-center justify-between">

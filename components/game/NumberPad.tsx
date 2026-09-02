@@ -29,14 +29,13 @@ export function NumberPad({
 
     if (notesMode) {
       toggleNote(selectedCell.row, selectedCell.col, digit);
+      onDone?.();
       return;
     }
 
     const isValid = setCellValue(selectedCell.row, selectedCell.col, digit);
     setLastRecognition(digit, isValid ? 100 : 100);
-    if (!notesMode && isValid) {
-      window.setTimeout(() => onDone?.(), 450);
-    }
+    onDone?.();
   };
 
   const handleClear = () => {
@@ -65,7 +64,7 @@ export function NumberPad({
             className={cn(
               "flex h-14 items-center justify-center rounded-2xl text-2xl font-bold active:scale-95",
               isSheet
-                ? "bg-background/40 active:bg-primary active:text-primary-foreground"
+                ? "bg-background/20 active:bg-primary active:text-primary-foreground"
                 : "bg-muted active:bg-primary active:text-primary-foreground",
               "disabled:opacity-40 disabled:active:bg-muted disabled:active:text-foreground",
             )}
@@ -81,7 +80,7 @@ export function NumberPad({
         onClick={handleClear}
         className={cn(
           "flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-medium disabled:opacity-40 active:scale-[0.98]",
-          isSheet ? "bg-background/40" : "bg-muted",
+          isSheet ? "bg-background/20" : "bg-muted",
         )}
       >
         <Eraser className="size-4" />

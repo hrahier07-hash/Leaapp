@@ -12,13 +12,17 @@ type NotesGrid = number[][][];
 type HistoryEntry = {
   grid: Grid;
   notes: NotesGrid;
+  hintMask: boolean[][];
 };
+
+type HintMask = boolean[][];
 
 type GameState = {
   initialGrid: Grid;
   solutionGrid: Grid;
   grid: Grid;
   notes: NotesGrid;
+  hintMask: HintMask;
   selectedCell: SelectedCell;
   mistakes: number;
   hintsUsed: number;
@@ -74,6 +78,14 @@ function cloneNotes(notes: NotesGrid): NotesGrid {
   return notes.map((row) => row.map((cell) => [...cell]));
 }
 
+function emptyHintMask(): HintMask {
+  return Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => false));
+}
+
+function cloneHintMask(mask: HintMask): HintMask {
+  return mask.map((row) => [...row]);
+}
+
 function createInitialState() {
   const initialGrid = cloneGrid(SAMPLE_PUZZLE);
   return {
@@ -81,6 +93,7 @@ function createInitialState() {
     solutionGrid: cloneGrid(SAMPLE_SOLUTION),
     grid: cloneGrid(initialGrid),
     notes: emptyNotes(),
+    hintMask: emptyHintMask(),
     selectedCell: null as SelectedCell,
     mistakes: 0,
     hintsUsed: 0,
@@ -103,7 +116,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   ...createInitialState(),
 
   selectCell: (row, col) => {
-    if (get().initialGrid[row][col] !== EMPTY) return;
+    const state = get();
+    if (state.initialGrid[row][col] !== EMPTY) return;
+    if (state.grid[row][col] !== EMPTY) return;
     set({ selectedCell: { row, col } });
   },
 
@@ -129,14 +144,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     nextGrid[row][col] = value;
     const nextNotes = cloneNotes(state.notes);
     nextNotes[row][col] = [];
+    const nextHintMask = cloneHintMask(state.hintMask);
+    nextHintMask[row][col] = false;
 
     set({
       history: [
         ...state.history,
-        { grid: cloneGrid(state.grid), notes: cloneNotes(state.notes) },
+        {
+          grid: cloneGrid(state.grid),
+          notes: cloneNotes(state.notes),
+          hintMask: cloneHintMask(state.hintMask),
+        },
       ],
       grid: nextGrid,
       notes: nextNotes,
+      hintMask: nextHintMask,
       mistakes: isCorrect ? state.mistakes : state.mistakes + 1,
       isComplete: isGridComplete(nextGrid, state.solutionGrid),
       selectedCell: { row, col },
@@ -165,13 +187,20 @@ export const useGameStore = create<GameState>((set, get) => ({
     nextGrid[row][col] = EMPTY;
     const nextNotes = cloneNotes(state.notes);
     nextNotes[row][col] = [];
+    const nextHintMask = cloneHintMask(state.hintMask);
+    nextHintMask[row][col] = false;
     set({
       history: [
         ...state.history,
-        { grid: cloneGrid(state.grid), notes: cloneNotes(state.notes) },
+        {
+          grid: cloneGrid(state.grid),
+          notes: cloneNotes(state.notes),
+          hintMask: cloneHintMask(state.hintMask),
+        },
       ],
       grid: nextGrid,
       notes: nextNotes,
+      hintMask: nextHintMask,
       isComplete: false,
     });
   },
@@ -183,6 +212,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({
       grid: cloneGrid(prev.grid),
       notes: cloneNotes(prev.notes),
+      hintMask: cloneHintMask(prev.hintMask),
       history: history.slice(0, -1),
       isComplete: isGridComplete(prev.grid, get().solutionGrid),
     });
@@ -191,24 +221,46 @@ export const useGameStore = create<GameState>((set, get) => ({
   useHint: () => {
     const state = get();
     if (state.hintsUsed >= state.hintsBudget) return false;
+
+    let row: number;
+    let col: number;
+    let value: number;
+
     const hint = getHint(state.grid, state.solutionGrid);
-    if (!hint || hint.kind !== "placement") return false;
+    if (hint?.kind === "placement") {
+      ({ row, col, value } = hint);
+    } else {
+      const fallback = findFallbackHintPlacement(
+        state.grid,
+        state.initialGrid,
+        state.solutionGrid,
+      );
+      if (!fallback) return false;
+      ({ row, col, value } = fallback);
+    }
 
     const nextGrid = cloneGrid(state.grid);
-    nextGrid[hint.row][hint.col] = hint.value;
+    nextGrid[row][col] = value as CellValue;
     const nextNotes = cloneNotes(state.notes);
-    nextNotes[hint.row][hint.col] = [];
+    nextNotes[row][col] = [];
+    const nextHintMask = cloneHintMask(state.hintMask);
+    nextHintMask[row][col] = true;
 
     set({
       history: [
         ...state.history,
-        { grid: cloneGrid(state.grid), notes: cloneNotes(state.notes) },
+        {
+          grid: cloneGrid(state.grid),
+          notes: cloneNotes(state.notes),
+          hintMask: cloneHintMask(state.hintMask),
+        },
       ],
       grid: nextGrid,
       notes: nextNotes,
+      hintMask: nextHintMask,
       hintsUsed: state.hintsUsed + 1,
       isComplete: isGridComplete(nextGrid, state.solutionGrid),
-      selectedCell: { row: hint.row, col: hint.col },
+      selectedCell: null,
     });
 
     return true;
@@ -230,6 +282,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       solutionGrid: cloneGrid(solutionGrid),
       grid,
       notes: emptyNotes(),
+      hintMask: emptyHintMask(),
       selectedCell: null,
       mistakes: 0,
       hintsUsed: 0,
@@ -252,3 +305,18 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   isGiven: (row, col) => get().initialGrid[row][col] !== EMPTY,
 }));
+
+function findFallbackHintPlacement(
+  grid: Grid,
+  initialGrid: Grid,
+  solutionGrid: Grid,
+): { row: number; col: number; value: number } | null {
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      if (initialGrid[row][col] !== EMPTY) continue;
+      if (grid[row][col] !== EMPTY) continue;
+      return { row, col, value: solutionGrid[row][col] };
+    }
+  }
+  return null;
+}

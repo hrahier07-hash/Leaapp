@@ -32,6 +32,7 @@ function getRelatedCells(
 export function SudokuBoard() {
   const grid = useGameStore((s) => s.grid);
   const notes = useGameStore((s) => s.notes);
+  const hintMask = useGameStore((s) => s.hintMask);
   const selectedCell = useGameStore((s) => s.selectedCell);
   const selectCell = useGameStore((s) => s.selectCell);
   const isGiven = useGameStore((s) => s.isGiven);
@@ -58,6 +59,7 @@ export function SudokuBoard() {
               selectedCell?.row === rowIndex &&
               selectedCell?.col === colIndex;
             const given = isGiven(rowIndex, colIndex);
+            const isHint = hintMask[rowIndex][colIndex];
             const isRelated = related.has(key) && !isSelected;
             const sameValue =
               selectedValue !== null &&
@@ -82,6 +84,7 @@ export function SudokuBoard() {
                   isSelected && "z-10 bg-primary/15 ring-2 ring-inset ring-primary",
                   isRelated && "bg-muted/40",
                   sameValue && "bg-primary/10 text-primary",
+                  isHint && "font-bold text-blue-950",
                 )}
               >
                 {value !== 0 ? (

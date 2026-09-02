@@ -1,8 +1,9 @@
 "use client";
 
-import { Pause, Play, Undo2, Lightbulb, PencilLine } from "lucide-react";
+import { Pause, Play, Undo2, PencilLine } from "lucide-react";
 import { useEffect } from "react";
 
+import { HintIcon } from "@/components/gamification/ResourceIcons";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/useGameStore";
 
@@ -23,12 +24,15 @@ export function GameHUD() {
   const togglePause = useGameStore((s) => s.togglePause);
   const toggleNotesMode = useGameStore((s) => s.toggleNotesMode);
   const undo = useGameStore((s) => s.undo);
-  const useHint = useGameStore((s) => s.useHint);
+  const applyHint = useGameStore((s) => s.useHint);
 
   useEffect(() => {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [tick]);
+
+  const hintsLeft = Math.max(0, hintsBudget - hintsUsed);
+  const canHint = hintsLeft > 0;
 
   return (
     <div className="space-y-3">
@@ -47,12 +51,19 @@ export function GameHUD() {
           </button>
           <button
             type="button"
-            onClick={useHint}
-            disabled={hintsUsed >= hintsBudget}
-            className="flex size-10 items-center justify-center rounded-full bg-muted active:scale-95 disabled:opacity-40"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              applyHint();
+            }}
+            disabled={!canHint}
+            className={cn(
+              "flex size-10 items-center justify-center rounded-full active:scale-95 disabled:opacity-40",
+              canHint ? "bg-amber-100" : "bg-muted",
+            )}
             aria-label="Indice"
           >
-            <Lightbulb className="size-4" />
+            <HintIcon className={cn(!canHint && "fill-muted text-muted-foreground")} />
           </button>
           <button
             type="button"
@@ -68,9 +79,9 @@ export function GameHUD() {
         </div>
       </div>
       <p className="text-center text-xs text-muted-foreground">
-        Indices : {hintsUsed} utilisé{hintsUsed > 1 ? "s" : ""} ·{" "}
-        {Math.max(0, hintsBudget - hintsUsed)} restant
-        {Math.max(0, hintsBudget - hintsUsed) > 1 ? "s" : ""}
+        <HintIcon className="mr-1 inline size-3.5 align-[-2px]" />
+        Indices : {hintsUsed} utilisé{hintsUsed > 1 ? "s" : ""} · {hintsLeft} restant
+        {hintsLeft > 1 ? "s" : ""}
       </p>
     </div>
   );

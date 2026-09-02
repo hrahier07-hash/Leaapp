@@ -24,7 +24,7 @@ export function InputPanel({ variant = "inline", onDone }: InputPanelProps) {
       <div
         className={cn(
           "grid grid-cols-2 gap-2 rounded-2xl p-1",
-          isSheet ? "bg-background/25" : "bg-muted/60",
+          isSheet ? "bg-background/20" : "bg-muted/60",
         )}
       >
         <button
@@ -34,7 +34,7 @@ export function InputPanel({ variant = "inline", onDone }: InputPanelProps) {
             "flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium transition-colors active:scale-[0.98]",
             mode === "draw"
               ? isSheet
-                ? "bg-background/40 text-foreground shadow-sm"
+                ? "bg-background/20 text-foreground shadow-sm"
                 : "bg-background text-foreground shadow-sm"
               : "text-muted-foreground",
           )}
@@ -49,7 +49,7 @@ export function InputPanel({ variant = "inline", onDone }: InputPanelProps) {
             "flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium transition-colors active:scale-[0.98]",
             mode === "keyboard"
               ? isSheet
-                ? "bg-background/40 text-foreground shadow-sm"
+                ? "bg-background/20 text-foreground shadow-sm"
                 : "bg-background text-foreground shadow-sm"
               : "text-muted-foreground",
           )}
