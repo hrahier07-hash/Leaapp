@@ -53,9 +53,13 @@ export default function ProfilPage() {
   if (error || !profile) {
     return (
       <MobileShell title="Profil">
-        <p className="py-8 text-center text-sm text-muted-foreground">
-          Les stats ne sont pas disponibles. Vérifie la base de données.
-        </p>
+        <div className="space-y-3 py-8 px-2 text-center text-sm text-muted-foreground">
+          <p>Les stats ne sont pas disponibles.</p>
+          <p className="text-xs leading-relaxed">
+            En ligne (Vercel), il faut une URL de base spéciale (pooler Supabase),
+            pas la connexion directe. Change DATABASE_URL sur Vercel puis redéploie.
+          </p>
+        </div>
       </MobileShell>
     );
   }
