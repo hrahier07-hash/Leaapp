@@ -31,6 +31,8 @@ type GameState = {
   lastRecognition: { digit: number; confidence: number } | null;
   gameMode: "free" | "lesson" | "story" | "daily";
   storyLevel: number | null;
+  dailyDateKey: string | null;
+  dailyPatternName: string | null;
   selectCell: (row: number, col: number) => void;
   toggleNotesMode: () => void;
   togglePause: () => void;
@@ -45,7 +47,12 @@ type GameState = {
   loadPuzzle: (
     initialGrid: Grid,
     solutionGrid: Grid,
-    options?: { gameMode?: GameState["gameMode"]; storyLevel?: number | null },
+    options?: {
+      gameMode?: GameState["gameMode"];
+      storyLevel?: number | null;
+      dailyDateKey?: string | null;
+      dailyPatternName?: string | null;
+    },
   ) => void;
   clearSelection: () => void;
   isGiven: (row: number, col: number) => boolean;
@@ -84,6 +91,8 @@ function createInitialState() {
     lastRecognition: null as { digit: number; confidence: number } | null,
     gameMode: "free" as const,
     storyLevel: null as number | null,
+    dailyDateKey: null as string | null,
+    dailyPatternName: null as string | null,
   };
 }
 
@@ -212,6 +221,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       lastRecognition: null,
       gameMode: options?.gameMode ?? "free",
       storyLevel: options?.storyLevel ?? null,
+      dailyDateKey: options?.dailyDateKey ?? null,
+      dailyPatternName: options?.dailyPatternName ?? null,
     });
   },
 

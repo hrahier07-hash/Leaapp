@@ -20,11 +20,19 @@ export function GameResults() {
   const hintsUsed = useGameStore((s) => s.hintsUsed);
   const gameMode = useGameStore((s) => s.gameMode);
   const storyLevel = useGameStore((s) => s.storyLevel);
+  const dailyDateKey = useGameStore((s) => s.dailyDateKey);
   const { refresh } = useSharedUser();
   const savedRef = useRef(false);
 
+  const difficulty =
+    gameMode === "daily"
+      ? "expert"
+      : gameMode === "story" && storyLevel
+        ? "moyen"
+        : "facile";
+
   const xp = computeXpForCompletion({
-    difficulty: gameMode === "story" && storyLevel ? "moyen" : "facile",
+    difficulty,
     timeSeconds: elapsedSeconds,
     mistakesCount: mistakes,
     hintsUsed,
@@ -48,7 +56,7 @@ export function GameResults() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        difficulty: "facile",
+        difficulty,
         timeSeconds: elapsedSeconds,
         mistakesCount: mistakes,
         hintsUsed,
@@ -62,6 +70,7 @@ export function GameResults() {
     refresh,
     gameMode,
     storyLevel,
+    difficulty,
   ]);
 
   if (!isComplete) return null;
@@ -91,7 +100,19 @@ export function GameResults() {
         </div>
       </div>
 
-      {gameMode === "story" && storyLevel ? (
+      {gameMode === "daily" ? (
+        <>
+          <p className="text-center text-sm text-muted-foreground">
+            Défi du {dailyDateKey ?? "jour"} terminé !
+          </p>
+          <Link
+            href="/app/defi-du-jour"
+            className={cn(buttonVariants(), "w-full")}
+          >
+            Retour au défi
+          </Link>
+        </>
+      ) : gameMode === "story" && storyLevel ? (
         <>
           {nextStoryLevel ? (
             <Link

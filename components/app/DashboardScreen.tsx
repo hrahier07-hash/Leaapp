@@ -16,8 +16,8 @@ export function DashboardScreen() {
           href="/app/defi-du-jour"
           className="block surface-card px-4 py-3 active:scale-[0.98]"
         >
-          <p className="text-xs font-medium text-muted-foreground">Grille du jour</p>
-          <p className="font-semibold">Même grille pour tous les joueurs</p>
+          <p className="text-xs font-medium text-muted-foreground">Défi du jour</p>
+          <p className="font-semibold">Grille difficile avec une forme spéciale</p>
         </Link>
 
         <PathMap />
