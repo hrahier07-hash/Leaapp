@@ -8,7 +8,14 @@ import { useGameStore } from "@/store/useGameStore";
 
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
-export function NumberPad({ onDone }: { onDone?: () => void }) {
+export function NumberPad({
+  onDone,
+  variant = "inline",
+}: {
+  onDone?: () => void;
+  variant?: "inline" | "sheet";
+}) {
+  const isSheet = variant === "sheet";
   const selectedCell = useGameStore((s) => s.selectedCell);
   const setCellValue = useGameStore((s) => s.setCellValue);
   const clearCell = useGameStore((s) => s.clearCell);
@@ -56,8 +63,10 @@ export function NumberPad({ onDone }: { onDone?: () => void }) {
             whileTap={{ scale: 0.92 }}
             onClick={() => handleDigit(digit)}
             className={cn(
-              "flex h-14 items-center justify-center rounded-2xl text-2xl font-bold",
-              "bg-muted active:bg-primary active:text-primary-foreground",
+              "flex h-14 items-center justify-center rounded-2xl text-2xl font-bold active:scale-95",
+              isSheet
+                ? "bg-background/40 active:bg-primary active:text-primary-foreground"
+                : "bg-muted active:bg-primary active:text-primary-foreground",
               "disabled:opacity-40 disabled:active:bg-muted disabled:active:text-foreground",
             )}
           >
@@ -70,7 +79,10 @@ export function NumberPad({ onDone }: { onDone?: () => void }) {
         type="button"
         disabled={!selectedCell}
         onClick={handleClear}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-muted text-sm font-medium disabled:opacity-40 active:scale-[0.98]"
+        className={cn(
+          "flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-medium disabled:opacity-40 active:scale-[0.98]",
+          isSheet ? "bg-background/40" : "bg-muted",
+        )}
       >
         <Eraser className="size-4" />
         Effacer la case

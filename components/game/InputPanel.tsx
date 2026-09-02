@@ -21,14 +21,21 @@ export function InputPanel({ variant = "inline", onDone }: InputPanelProps) {
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted/60 p-1">
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-2 rounded-2xl p-1",
+          isSheet ? "bg-background/25" : "bg-muted/60",
+        )}
+      >
         <button
           type="button"
           onClick={() => setMode("draw")}
           className={cn(
             "flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium transition-colors active:scale-[0.98]",
             mode === "draw"
-              ? "bg-background text-foreground shadow-sm"
+              ? isSheet
+                ? "bg-background/40 text-foreground shadow-sm"
+                : "bg-background text-foreground shadow-sm"
               : "text-muted-foreground",
           )}
         >
@@ -41,7 +48,9 @@ export function InputPanel({ variant = "inline", onDone }: InputPanelProps) {
           className={cn(
             "flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium transition-colors active:scale-[0.98]",
             mode === "keyboard"
-              ? "bg-background text-foreground shadow-sm"
+              ? isSheet
+                ? "bg-background/40 text-foreground shadow-sm"
+                : "bg-background text-foreground shadow-sm"
               : "text-muted-foreground",
           )}
         >
@@ -59,7 +68,7 @@ export function InputPanel({ variant = "inline", onDone }: InputPanelProps) {
         {mode === "draw" ? (
           <DrawPad variant={isSheet ? "sheet" : "inline"} onDone={onDone} />
         ) : (
-          <NumberPad onDone={onDone} />
+          <NumberPad variant={isSheet ? "sheet" : "inline"} onDone={onDone} />
         )}
       </motion.div>
     </div>

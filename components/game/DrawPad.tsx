@@ -248,7 +248,7 @@ export function DrawPad({
     setHint("Case effacée");
   };
 
-  const canvasHeight = variant === "sheet" ? "h-36" : "h-48";
+  const canvasHeight = variant === "sheet" ? "h-40" : "h-48";
   const showCanvas = variant === "sheet" || selectedCell;
 
   return (
@@ -300,7 +300,7 @@ export function DrawPad({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             className={cn(
-              "overflow-hidden rounded-2xl border-2 bg-white/85 shadow-inner",
+              "overflow-hidden rounded-2xl border-2 bg-white/50 shadow-inner",
               isDrawing ? "border-primary" : "border-border",
               isRecognizing && "opacity-70",
             )}

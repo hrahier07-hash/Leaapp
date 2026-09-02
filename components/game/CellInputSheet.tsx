@@ -15,41 +15,42 @@ export function CellInputSheet() {
   return (
     <AnimatePresence>
       {selectedCell && (
-        <>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.button
             type="button"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-black/10"
+            className="absolute inset-0 bg-black/5"
             aria-label="Fermer"
             onClick={clearSelection}
           />
+
           <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="fixed bottom-0 left-1/2 z-50 flex max-h-[38vh] w-full max-w-[430px] -translate-x-1/2 flex-col rounded-t-2xl border-t border-border/40 bg-background/55 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 shadow-lg backdrop-blur-md"
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.94 }}
+            transition={{ type: "spring", damping: 26, stiffness: 340 }}
+            className="relative z-10 w-full max-w-[min(100%,22rem)] rounded-2xl border border-white/30 bg-background/20 px-4 py-3 shadow-lg backdrop-blur-[2px]"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-2 flex shrink-0 items-center justify-between">
-              <p className="text-xs font-medium text-foreground/80">
-                Case ligne {row + 1}, colonne {col + 1}
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold text-foreground/90">
+                Case {row + 1}, {col + 1}
               </p>
               <button
                 type="button"
                 onClick={clearSelection}
-                className="flex size-8 items-center justify-center rounded-full bg-background/60 active:scale-95"
+                className="flex size-8 items-center justify-center rounded-full bg-background/30 active:scale-95"
                 aria-label="Fermer"
               >
                 <X className="size-3.5" />
               </button>
             </div>
-            <div className="min-h-0 overflow-y-auto">
-              <InputPanel variant="sheet" onDone={clearSelection} />
-            </div>
+
+            <InputPanel variant="sheet" onDone={clearSelection} />
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
