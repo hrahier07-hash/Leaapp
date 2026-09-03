@@ -59,7 +59,7 @@ export function StoryWorldMap() {
           className="relative surface-card border-0 p-4 shadow-sm backdrop-blur-sm"
           style={{ backgroundColor: palette.card }}
         >
-          <p className="text-xs font-medium uppercase tracking-wide" style={{ color: palette.accent }}>
+          <p className="font-heading text-xs font-medium uppercase tracking-wide" style={{ color: palette.accent }}>
             {STORY_WORLD_TITLE}
           </p>
           <p className="mt-1 text-sm leading-relaxed" style={{ color: palette.textMuted }}>

@@ -59,7 +59,7 @@ export function DailyChallengeInfoSheet({
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
-                <p className="text-base font-semibold">Comment jouer</p>
+                <p className="font-heading text-base font-semibold">Comment jouer</p>
                 <p className="text-xs text-muted-foreground">Défi du jour</p>
               </div>
               <button
@@ -75,7 +75,7 @@ export function DailyChallengeInfoSheet({
             <div className="space-y-3 text-sm">
               {SECTIONS.map((section) => (
                 <div key={section.title}>
-                  <p className="font-medium">{section.title}</p>
+                  <p className="font-heading font-medium">{section.title}</p>
                   <p className="mt-0.5 text-muted-foreground leading-relaxed">
                     {section.body}
                   </p>

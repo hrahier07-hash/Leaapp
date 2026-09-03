@@ -115,7 +115,7 @@ export default function ProfilPage() {
         <div className="surface-card space-y-3 p-4">
           <div className="flex items-center gap-2">
             <RotateCcw className="size-4 text-muted-foreground" />
-            <p className="text-sm font-semibold">Réinitialiser le compte</p>
+            <p className="font-heading text-sm font-semibold">Réinitialiser le compte</p>
           </div>
           <p className="text-xs text-muted-foreground">
             Remet tout à zéro comme au premier jour :

@@ -122,7 +122,7 @@ export function DailyChallengeScreen() {
           <p className="text-sm text-muted-foreground">
             {preview?.dateLabel ?? formatParisDateLabel(dateKey)}
           </p>
-          <p className="text-lg font-bold">
+          <p className="font-heading text-lg font-bold">
             Forme du jour : {preview?.patternName ?? "…"}
           </p>
           <p className="text-sm text-muted-foreground">

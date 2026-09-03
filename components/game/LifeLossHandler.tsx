@@ -67,7 +67,7 @@ function NoLivesOverlay() {
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-sm rounded-2xl border-2 border-primary bg-background p-5 text-center shadow-xl">
         <HeartIcon className="mx-auto size-10" />
-        <p className="mt-3 text-lg font-bold">Plus de vies</p>
+        <p className="font-heading mt-3 text-lg font-bold">Plus de vies</p>
         <p className="mt-2 text-sm text-muted-foreground">
           3 erreurs ont coûté ta dernière vie. Reviens demain ou attends minuit
           (heure de Paris) pour retrouver 5 vies et 5 indices.
@@ -106,7 +106,7 @@ export function NoLivesGate({ children }: { children: React.ReactNode }) {
     return (
       <div className="space-y-4 py-8 text-center">
         <HeartIcon className="mx-auto size-12" />
-        <p className="text-lg font-bold">Plus de vies aujourd&apos;hui</p>
+        <p className="font-heading text-lg font-bold">Plus de vies aujourd&apos;hui</p>
         <p className="text-sm text-muted-foreground">
           Tes vies et indices se rechargent à minuit (heure de Paris).
         </p>

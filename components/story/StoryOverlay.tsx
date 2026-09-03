@@ -181,7 +181,7 @@ function MilestoneBeatScreen({
             transition={{ delay: 0.6 }}
             className="space-y-2 rounded-xl bg-primary/5 p-3 text-xs leading-relaxed text-muted-foreground"
           >
-            <p className="font-semibold text-foreground">Fin du Grimoire Déchiré</p>
+            <p className="font-heading font-semibold text-foreground">Fin du Grimoire Déchiré</p>
             <p>
               Le village se réveille. Une suite pourrait commencer — un nouveau chapitre
               attend peut-être Elian et Sylvaine…

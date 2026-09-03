@@ -63,7 +63,7 @@ export function StoryGallery() {
                 {beat.isMilestone ? " · Page majeure" : ""}
               </p>
               {beat.chapterTitle && (
-                <p className="mt-1 font-semibold">{beat.chapterTitle}</p>
+                <p className="font-heading mt-1 font-semibold">{beat.chapterTitle}</p>
               )}
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {beat.caption}
